@@ -1,0 +1,300 @@
+---
+title: "Selection in aDNA with Ancestral Paintings"
+output:
+  html_notebook:
+    df_print: paged
+    code_folding: hide
+  html_document:
+    df_print: paged
+    code_folding: hide
+---
+# Selection in aDNA with Ancestral Paintings - Peaks
+
+```{r}
+# load some helper functions
+source("scripts/clues_plot_extended_data_figures.R")
+```
+
+```{r}
+gene_names
+
+focal_regions
+
+# get the top SNP records
+top_snps <- peaks_joined %>% 
+  filter(rsid %in% top_marginal_snps$rsid)  %>%
+  group_by(merged_peaks, rsid) %>%
+  slice_min(p.value, n = 1) %>%
+  arrange(chrom, start) %>%
+  select(merged_peaks, rsid, genes, gwascat, pubmed, ancestry, p.value, s)
+
+region01 <- filter(top_snps, merged_peaks == focal_regions[1]) %>% arrange(p.value)
+region02 <- filter(top_snps, merged_peaks == focal_regions[2]) %>% arrange(p.value)
+region03 <- filter(top_snps, merged_peaks == focal_regions[3]) %>% arrange(p.value)
+region04 <- filter(top_snps, merged_peaks == focal_regions[4]) %>% arrange(p.value)
+region05 <- filter(top_snps, merged_peaks == focal_regions[5]) %>% arrange(p.value)
+region06 <- filter(top_snps, merged_peaks == focal_regions[6]) %>% arrange(p.value)
+region07 <- filter(top_snps, merged_peaks == focal_regions[7]) %>% arrange(p.value)
+region08 <- filter(top_snps, merged_peaks == focal_regions[8]) %>% arrange(p.value)
+region09 <- filter(top_snps, merged_peaks == focal_regions[9]) %>% arrange(p.value)
+region10 <- filter(top_snps, merged_peaks == focal_regions[10]) %>% arrange(p.value)
+region11 <- filter(top_snps, merged_peaks == focal_regions[11]) %>% arrange(p.value)
+region12 <- filter(top_snps, merged_peaks == focal_regions[12]) %>% arrange(p.value)
+region13 <- filter(top_snps, merged_peaks == focal_regions[13]) %>% arrange(p.value)
+region14 <- filter(top_snps, merged_peaks == focal_regions[14]) %>% arrange(p.value)
+region15 <- filter(top_snps, merged_peaks == focal_regions[15]) %>% arrange(p.value)
+region16 <- filter(top_snps, merged_peaks == focal_regions[16]) %>% arrange(p.value)
+region17 <- filter(top_snps, merged_peaks == focal_regions[17]) %>% arrange(p.value)
+region18 <- filter(top_snps, merged_peaks == focal_regions[18]) %>% arrange(p.value)
+region19 <- filter(top_snps, merged_peaks == focal_regions[19]) %>% arrange(p.value)
+region20 <- filter(top_snps, merged_peaks == focal_regions[20]) %>% arrange(p.value)
+region21 <- filter(top_snps, merged_peaks == focal_regions[21]) %>% arrange(p.value)
+```
+
+#### Peak 1: `r gene_names[1,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[1,]$genes`* locus, spanning `r gene_names[1,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region01[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region01[1,]$rsid` (*`r region01[1,]$genes`*; `r region01[1,]$ancestry`; p=`r formatC(region01[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region01[1,]$s, digits=3)`), associated with `r region01[1,]$gwascat` (`r region01[1,]$pubmed`).
+* `r region01[2,]$rsid` (*`r region01[2,]$genes`*; `r region01[2,]$ancestry`; p=`r formatC(region01[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region01[2,]$s, digits=3)`), associated with `r region01[2,]$gwascat` (`r region01[2,]$pubmed`).
+* `r region01[3,]$rsid` (*`r region01[3,]$genes`*; `r region01[3,]$ancestry`; p=`r formatC(region01[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region01[3,]$s, digits=3)`), associated with `r region01[3,]$gwascat` (`r region01[3,]$pubmed`).
+* `r region01[4,]$rsid` (*`r region01[4,]$genes`*; `r region01[4,]$ancestry`; p=`r formatC(region01[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region01[4,]$s, digits=3)`), associated with `r region01[4,]$gwascat` (`r region01[4,]$pubmed`).
+* `r region01[5,]$rsid` (*`r region01[5,]$genes`*; `r region01[5,]$ancestry`; p=`r formatC(region01[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region01[5,]$s, digits=3)`), associated with `r region01[5,]$gwascat` (`r region01[5,]$pubmed`).
+
+#### Peak 2: `r gene_names[2,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[2,]$genes`* locus, spanning `r gene_names[2,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region02[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region02[1,]$rsid` (*`r region02[1,]$genes`*; `r region02[1,]$ancestry`; p=`r formatC(region02[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region02[1,]$s, digits=3)`), associated with `r region02[1,]$gwascat` (`r region02[1,]$pubmed`).
+* `r region02[2,]$rsid` (*`r region02[2,]$genes`*; `r region02[2,]$ancestry`; p=`r formatC(region02[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region02[2,]$s, digits=3)`), associated with `r region02[2,]$gwascat` (`r region02[2,]$pubmed`).
+* `r region02[3,]$rsid` (*`r region02[3,]$genes`*; `r region02[3,]$ancestry`; p=`r formatC(region02[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region02[3,]$s, digits=3)`), associated with `r region02[3,]$gwascat` (`r region02[3,]$pubmed`).
+* `r region02[4,]$rsid` (*`r region02[4,]$genes`*; `r region02[4,]$ancestry`; p=`r formatC(region02[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region02[4,]$s, digits=3)`), associated with `r region02[4,]$gwascat` (`r region02[4,]$pubmed`).
+
+#### Peak 3: `r gene_names[3,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[3,]$genes`* locus, spanning `r gene_names[3,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region03[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region03[1,]$rsid` (*`r region03[1,]$genes`*; `r region03[1,]$ancestry`; p=`r formatC(region03[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region03[1,]$s, digits=3)`), associated with `r region03[1,]$gwascat` (`r region03[1,]$pubmed`).
+* `r region03[2,]$rsid` (*`r region03[2,]$genes`*; `r region03[2,]$ancestry`; p=`r formatC(region03[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region03[2,]$s, digits=3)`), associated with `r region03[2,]$gwascat` (`r region03[2,]$pubmed`).
+* `r region03[3,]$rsid` (*`r region03[3,]$genes`*; `r region03[3,]$ancestry`; p=`r formatC(region03[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region03[3,]$s, digits=3)`), associated with `r region03[3,]$gwascat` (`r region03[3,]$pubmed`).
+* `r region03[4,]$rsid` (*`r region03[4,]$genes`*; `r region03[4,]$ancestry`; p=`r formatC(region03[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region03[4,]$s, digits=3)`), associated with `r region03[4,]$gwascat` (`r region03[4,]$pubmed`).
+* `r region03[5,]$rsid` (*`r region03[5,]$genes`*; `r region03[5,]$ancestry`; p=`r formatC(region03[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region03[5,]$s, digits=3)`), associated with `r region03[5,]$gwascat` (`r region03[5,]$pubmed`).
+
+#### Peak 4: `r gene_names[4,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[4,]$genes`* locus, spanning `r gene_names[4,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region04[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region04[1,]$rsid` (*`r region04[1,]$genes`*; `r region04[1,]$ancestry`; p=`r formatC(region04[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region04[1,]$s, digits=3)`), associated with `r region04[1,]$gwascat` (`r region04[1,]$pubmed`).
+* `r region04[2,]$rsid` (*`r region04[2,]$genes`*; `r region04[2,]$ancestry`; p=`r formatC(region04[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region04[2,]$s, digits=3)`), associated with `r region04[2,]$gwascat` (`r region04[2,]$pubmed`).
+* `r region04[3,]$rsid` (*`r region04[3,]$genes`*; `r region04[3,]$ancestry`; p=`r formatC(region04[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region04[3,]$s, digits=3)`), associated with `r region04[3,]$gwascat` (`r region04[3,]$pubmed`).
+* `r region04[4,]$rsid` (*`r region04[4,]$genes`*; `r region04[4,]$ancestry`; p=`r formatC(region04[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region04[4,]$s, digits=3)`), associated with `r region04[4,]$gwascat` (`r region04[4,]$pubmed`).
+* `r region04[5,]$rsid` (*`r region04[5,]$genes`*; `r region04[5,]$ancestry`; p=`r formatC(region04[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region04[5,]$s, digits=3)`), associated with `r region04[5,]$gwascat` (`r region04[5,]$pubmed`).
+
+#### Peak 5: `r gene_names[5,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[5,]$genes`* locus, spanning `r gene_names[5,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region05[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region05[1,]$rsid` (*`r region05[1,]$genes`*; `r region05[1,]$ancestry`; p=`r formatC(region05[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region05[1,]$s, digits=3)`), associated with `r region05[1,]$gwascat` (`r region05[1,]$pubmed`).
+* `r region05[2,]$rsid` (*`r region05[2,]$genes`*; `r region05[2,]$ancestry`; p=`r formatC(region05[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region05[2,]$s, digits=3)`), associated with `r region05[2,]$gwascat` (`r region05[2,]$pubmed`).
+* `r region05[3,]$rsid` (*`r region05[3,]$genes`*; `r region05[3,]$ancestry`; p=`r formatC(region05[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region05[3,]$s, digits=3)`), associated with `r region05[3,]$gwascat` (`r region05[3,]$pubmed`).
+* `r region05[4,]$rsid` (*`r region05[4,]$genes`*; `r region05[4,]$ancestry`; p=`r formatC(region05[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region05[4,]$s, digits=3)`), associated with `r region05[4,]$gwascat` (`r region05[4,]$pubmed`).
+* `r region05[5,]$rsid` (*`r region05[5,]$genes`*; `r region05[5,]$ancestry`; p=`r formatC(region05[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region05[5,]$s, digits=3)`), associated with `r region05[5,]$gwascat` (`r region05[5,]$pubmed`).
+
+#### Peak 6: `r gene_names[6,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[6,]$genes`* locus, spanning `r gene_names[6,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region06[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region06[1,]$rsid` (*`r region06[1,]$genes`*; `r region06[1,]$ancestry`; p=`r formatC(region06[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region06[1,]$s, digits=3)`), associated with `r region06[1,]$gwascat` (`r region06[1,]$pubmed`).
+* `r region06[2,]$rsid` (*`r region06[2,]$genes`*; `r region06[2,]$ancestry`; p=`r formatC(region06[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region06[2,]$s, digits=3)`), associated with `r region06[2,]$gwascat` (`r region06[2,]$pubmed`).
+* `r region06[3,]$rsid` (*`r region06[3,]$genes`*; `r region06[3,]$ancestry`; p=`r formatC(region06[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region06[3,]$s, digits=3)`), associated with `r region06[3,]$gwascat` (`r region06[3,]$pubmed`).
+* `r region06[4,]$rsid` (*`r region06[4,]$genes`*; `r region06[4,]$ancestry`; p=`r formatC(region06[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region06[4,]$s, digits=3)`), associated with `r region06[4,]$gwascat` (`r region06[4,]$pubmed`).
+
+#### Peak 7: `r gene_names[7,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[7,]$genes`* locus, spanning `r gene_names[7,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region07[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region07[1,]$rsid` (*`r region07[1,]$genes`*; `r region07[1,]$ancestry`; p=`r formatC(region07[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region07[1,]$s, digits=3)`), associated with `r region07[1,]$gwascat` (`r region07[1,]$pubmed`).
+* `r region07[2,]$rsid` (*`r region07[2,]$genes`*; `r region07[2,]$ancestry`; p=`r formatC(region07[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region07[2,]$s, digits=3)`), associated with `r region07[2,]$gwascat` (`r region07[2,]$pubmed`).
+* `r region07[3,]$rsid` (*`r region07[3,]$genes`*; `r region07[3,]$ancestry`; p=`r formatC(region07[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region07[3,]$s, digits=3)`), associated with `r region07[3,]$gwascat` (`r region07[3,]$pubmed`).
+* `r region07[4,]$rsid` (*`r region07[4,]$genes`*; `r region07[4,]$ancestry`; p=`r formatC(region07[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region07[4,]$s, digits=3)`), associated with `r region07[4,]$gwascat` (`r region07[4,]$pubmed`).
+* `r region07[5,]$rsid` (*`r region07[5,]$genes`*; `r region07[5,]$ancestry`; p=`r formatC(region07[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region07[5,]$s, digits=3)`), associated with `r region07[5,]$gwascat` (`r region07[5,]$pubmed`).
+
+#### Peak 8: `r gene_names[8,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[8,]$genes`* locus, spanning `r gene_names[8,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region08[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region08[1,]$rsid` (*`r region08[1,]$genes`*; `r region08[1,]$ancestry`; p=`r formatC(region08[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region08[1,]$s, digits=3)`), associated with `r region08[1,]$gwascat` (`r region08[1,]$pubmed`).
+* `r region08[2,]$rsid` (*`r region08[2,]$genes`*; `r region08[2,]$ancestry`; p=`r formatC(region08[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region08[2,]$s, digits=3)`), associated with `r region08[2,]$gwascat` (`r region08[2,]$pubmed`).
+* `r region08[3,]$rsid` (*`r region08[3,]$genes`*; `r region08[3,]$ancestry`; p=`r formatC(region08[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region08[3,]$s, digits=3)`), associated with `r region08[3,]$gwascat` (`r region08[3,]$pubmed`).
+* `r region08[4,]$rsid` (*`r region08[4,]$genes`*; `r region08[4,]$ancestry`; p=`r formatC(region08[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region08[4,]$s, digits=3)`), associated with `r region08[4,]$gwascat` (`r region08[4,]$pubmed`).
+* `r region08[5,]$rsid` (*`r region08[5,]$genes`*; `r region08[5,]$ancestry`; p=`r formatC(region08[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region08[5,]$s, digits=3)`), associated with `r region08[5,]$gwascat` (`r region08[5,]$pubmed`).
+
+#### Peak 9: `r gene_names[9,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[9,]$genes`* locus, spanning `r gene_names[9,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region09[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region09[1,]$rsid` (*`r region09[1,]$genes`*; `r region09[1,]$ancestry`; p=`r formatC(region09[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region09[1,]$s, digits=3)`), associated with `r region09[1,]$gwascat` (`r region09[1,]$pubmed`).
+* `r region09[2,]$rsid` (*`r region09[2,]$genes`*; `r region09[2,]$ancestry`; p=`r formatC(region09[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region09[2,]$s, digits=3)`), associated with `r region09[2,]$gwascat` (`r region09[2,]$pubmed`).
+* `r region09[3,]$rsid` (*`r region09[3,]$genes`*; `r region09[3,]$ancestry`; p=`r formatC(region09[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region09[3,]$s, digits=3)`), associated with `r region09[3,]$gwascat` (`r region09[3,]$pubmed`).
+* `r region09[4,]$rsid` (*`r region09[4,]$genes`*; `r region09[4,]$ancestry`; p=`r formatC(region09[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region09[4,]$s, digits=3)`), associated with `r region09[4,]$gwascat` (`r region09[4,]$pubmed`).
+
+#### Peak 10: `r gene_names[10,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[10,]$genes`* locus, spanning `r gene_names[10,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region10[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region10[1,]$rsid` (*`r region10[1,]$genes`*; `r region10[1,]$ancestry`; p=`r formatC(region10[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region10[1,]$s, digits=3)`), associated with `r region10[1,]$gwascat` (`r region10[1,]$pubmed`).
+* `r region10[2,]$rsid` (*`r region10[2,]$genes`*; `r region10[2,]$ancestry`; p=`r formatC(region10[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region10[2,]$s, digits=3)`), associated with `r region10[2,]$gwascat` (`r region10[2,]$pubmed`).
+* `r region10[3,]$rsid` (*`r region10[3,]$genes`*; `r region10[3,]$ancestry`; p=`r formatC(region10[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region10[3,]$s, digits=3)`), associated with `r region10[3,]$gwascat` (`r region10[3,]$pubmed`).
+* `r region10[4,]$rsid` (*`r region10[4,]$genes`*; `r region10[4,]$ancestry`; p=`r formatC(region10[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region10[4,]$s, digits=3)`), associated with `r region10[4,]$gwascat` (`r region10[4,]$pubmed`).
+* `r region10[5,]$rsid` (*`r region10[5,]$genes`*; `r region10[5,]$ancestry`; p=`r formatC(region10[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region10[5,]$s, digits=3)`), associated with `r region10[5,]$gwascat` (`r region10[5,]$pubmed`).
+
+
+#### Peak 11: `r gene_names[11,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[11,]$genes`* locus, spanning `r gene_names[11,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region11[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region11[1,]$rsid` (*`r region11[1,]$genes`*; `r region11[1,]$ancestry`; p=`r formatC(region11[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region11[1,]$s, digits=3)`), associated with `r region11[1,]$gwascat` (`r region11[1,]$pubmed`).
+* `r region11[2,]$rsid` (*`r region11[2,]$genes`*; `r region11[2,]$ancestry`; p=`r formatC(region11[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region11[2,]$s, digits=3)`), associated with `r region11[2,]$gwascat` (`r region11[2,]$pubmed`).
+* `r region11[3,]$rsid` (*`r region11[3,]$genes`*; `r region11[3,]$ancestry`; p=`r formatC(region11[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region11[3,]$s, digits=3)`), associated with `r region11[3,]$gwascat` (`r region11[3,]$pubmed`).
+* `r region11[4,]$rsid` (*`r region11[4,]$genes`*; `r region11[4,]$ancestry`; p=`r formatC(region11[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region11[4,]$s, digits=3)`), associated with `r region11[4,]$gwascat` (`r region11[4,]$pubmed`).
+* `r region11[5,]$rsid` (*`r region11[5,]$genes`*; `r region11[5,]$ancestry`; p=`r formatC(region11[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region11[5,]$s, digits=3)`), associated with `r region11[5,]$gwascat` (`r region11[5,]$pubmed`).
+
+#### Peak 12: `r gene_names[12,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[12,]$genes`* locus, spanning `r gene_names[12,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region12[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region12[1,]$rsid` (*`r region12[1,]$genes`*; `r region12[1,]$ancestry`; p=`r formatC(region12[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region12[1,]$s, digits=3)`), associated with `r region12[1,]$gwascat` (`r region12[1,]$pubmed`).
+* `r region12[2,]$rsid` (*`r region12[2,]$genes`*; `r region12[2,]$ancestry`; p=`r formatC(region12[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region12[2,]$s, digits=3)`), associated with `r region12[2,]$gwascat` (`r region12[2,]$pubmed`).
+* `r region12[3,]$rsid` (*`r region12[3,]$genes`*; `r region12[3,]$ancestry`; p=`r formatC(region12[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region12[3,]$s, digits=3)`), associated with `r region12[3,]$gwascat` (`r region12[3,]$pubmed`).
+* `r region12[4,]$rsid` (*`r region12[4,]$genes`*; `r region12[4,]$ancestry`; p=`r formatC(region12[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region12[4,]$s, digits=3)`), associated with `r region12[4,]$gwascat` (`r region12[4,]$pubmed`).
+* `r region12[5,]$rsid` (*`r region12[5,]$genes`*; `r region12[5,]$ancestry`; p=`r formatC(region12[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region12[5,]$s, digits=3)`), associated with `r region12[5,]$gwascat` (`r region12[5,]$pubmed`).
+
+#### Peak 13: `r gene_names[13,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[13,]$genes`* locus, spanning `r gene_names[13,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region13[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region13[1,]$rsid` (*`r region13[1,]$genes`*; `r region13[1,]$ancestry`; p=`r formatC(region13[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region13[1,]$s, digits=3)`), associated with `r region13[1,]$gwascat` (`r region13[1,]$pubmed`).
+* `r region13[2,]$rsid` (*`r region13[2,]$genes`*; `r region13[2,]$ancestry`; p=`r formatC(region13[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region13[2,]$s, digits=3)`), associated with `r region13[2,]$gwascat` (`r region13[2,]$pubmed`).
+* `r region13[3,]$rsid` (*`r region13[3,]$genes`*; `r region13[3,]$ancestry`; p=`r formatC(region13[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region13[3,]$s, digits=3)`), associated with `r region13[3,]$gwascat` (`r region13[3,]$pubmed`).
+* `r region13[4,]$rsid` (*`r region13[4,]$genes`*; `r region13[4,]$ancestry`; p=`r formatC(region13[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region13[4,]$s, digits=3)`), associated with `r region13[4,]$gwascat` (`r region13[4,]$pubmed`).
+
+#### Peak 14: `r gene_names[14,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[14,]$genes`* locus, spanning `r gene_names[14,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region14[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region14[1,]$rsid` (*`r region14[1,]$genes`*; `r region14[1,]$ancestry`; p=`r formatC(region14[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region14[1,]$s, digits=3)`), associated with `r region14[1,]$gwascat` (`r region14[1,]$pubmed`).
+* `r region14[2,]$rsid` (*`r region14[2,]$genes`*; `r region14[2,]$ancestry`; p=`r formatC(region14[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region14[2,]$s, digits=3)`), associated with `r region14[2,]$gwascat` (`r region14[2,]$pubmed`).
+* `r region14[3,]$rsid` (*`r region14[3,]$genes`*; `r region14[3,]$ancestry`; p=`r formatC(region14[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region14[3,]$s, digits=3)`), associated with `r region14[3,]$gwascat` (`r region14[3,]$pubmed`).
+* `r region14[4,]$rsid` (*`r region14[4,]$genes`*; `r region14[4,]$ancestry`; p=`r formatC(region14[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region14[4,]$s, digits=3)`), associated with `r region14[4,]$gwascat` (`r region14[4,]$pubmed`).
+* `r region14[5,]$rsid` (*`r region14[5,]$genes`*; `r region14[5,]$ancestry`; p=`r formatC(region14[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region14[5,]$s, digits=3)`), associated with `r region14[5,]$gwascat` (`r region14[5,]$pubmed`).
+
+#### Peak 15: `r gene_names[15,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[15,]$genes`* locus, spanning `r gene_names[15,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region15[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region15[1,]$rsid` (*`r region15[1,]$genes`*; `r region15[1,]$ancestry`; p=`r formatC(region15[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region15[1,]$s, digits=3)`), associated with `r region15[1,]$gwascat` (`r region15[1,]$pubmed`).
+* `r region15[2,]$rsid` (*`r region15[2,]$genes`*; `r region15[2,]$ancestry`; p=`r formatC(region15[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region15[2,]$s, digits=3)`), associated with `r region15[2,]$gwascat` (`r region15[2,]$pubmed`).
+* `r region15[3,]$rsid` (*`r region15[3,]$genes`*; `r region15[3,]$ancestry`; p=`r formatC(region15[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region15[3,]$s, digits=3)`), associated with `r region15[3,]$gwascat` (`r region15[3,]$pubmed`).
+* `r region15[4,]$rsid` (*`r region15[4,]$genes`*; `r region15[4,]$ancestry`; p=`r formatC(region15[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region15[4,]$s, digits=3)`), associated with `r region15[4,]$gwascat` (`r region15[4,]$pubmed`).
+* `r region15[5,]$rsid` (*`r region15[5,]$genes`*; `r region15[5,]$ancestry`; p=`r formatC(region15[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region15[5,]$s, digits=3)`), associated with `r region15[5,]$gwascat` (`r region15[5,]$pubmed`).
+
+#### Peak 16: `r gene_names[16,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[16,]$genes`* locus, spanning `r gene_names[16,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region16[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region16[1,]$rsid` (*`r region16[1,]$genes`*; `r region16[1,]$ancestry`; p=`r formatC(region16[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region16[1,]$s, digits=3)`), associated with `r region16[1,]$gwascat` (`r region16[1,]$pubmed`).
+* `r region16[2,]$rsid` (*`r region16[2,]$genes`*; `r region16[2,]$ancestry`; p=`r formatC(region16[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region16[2,]$s, digits=3)`), associated with `r region16[2,]$gwascat` (`r region16[2,]$pubmed`).
+* `r region16[3,]$rsid` (*`r region16[3,]$genes`*; `r region16[3,]$ancestry`; p=`r formatC(region16[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region16[3,]$s, digits=3)`), associated with `r region16[3,]$gwascat` (`r region16[3,]$pubmed`).
+* `r region16[4,]$rsid` (*`r region16[4,]$genes`*; `r region16[4,]$ancestry`; p=`r formatC(region16[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region16[4,]$s, digits=3)`), associated with `r region16[4,]$gwascat` (`r region16[4,]$pubmed`).
+* `r region16[5,]$rsid` (*`r region16[5,]$genes`*; `r region16[5,]$ancestry`; p=`r formatC(region16[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region16[5,]$s, digits=3)`), associated with `r region16[5,]$gwascat` (`r region16[5,]$pubmed`).
+
+#### Peak 17: `r gene_names[17,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[17,]$genes`* locus, spanning `r gene_names[17,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region17[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region17[1,]$rsid` (*`r region17[1,]$genes`*; `r region17[1,]$ancestry`; p=`r formatC(region17[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region17[1,]$s, digits=3)`), associated with `r region17[1,]$gwascat` (`r region17[1,]$pubmed`).
+
+#### Peak 18: `r gene_names[18,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[18,]$genes`* locus, spanning `r gene_names[18,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region18[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region18[1,]$rsid` (*`r region18[1,]$genes`*; `r region18[1,]$ancestry`; p=`r formatC(region18[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region18[1,]$s, digits=3)`), associated with `r region18[1,]$gwascat` (`r region18[1,]$pubmed`).
+* `r region18[2,]$rsid` (*`r region18[2,]$genes`*; `r region18[2,]$ancestry`; p=`r formatC(region18[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region18[2,]$s, digits=3)`), associated with `r region18[2,]$gwascat` (`r region18[2,]$pubmed`).
+
+#### Peak 19: `r gene_names[19,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[19,]$genes`* locus, spanning `r gene_names[19,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region19[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region19[1,]$rsid` (*`r region19[1,]$genes`*; `r region19[1,]$ancestry`; p=`r formatC(region19[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region19[1,]$s, digits=3)`), associated with `r region19[1,]$gwascat` (`r region19[1,]$pubmed`).
+* `r region19[2,]$rsid` (*`r region19[2,]$genes`*; `r region19[2,]$ancestry`; p=`r formatC(region19[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region19[2,]$s, digits=3)`), associated with `r region19[2,]$gwascat` (`r region19[2,]$pubmed`).
+* `r region19[3,]$rsid` (*`r region19[3,]$genes`*; `r region19[3,]$ancestry`; p=`r formatC(region19[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region19[3,]$s, digits=3)`), associated with `r region19[3,]$gwascat` (`r region19[3,]$pubmed`).
+* `r region19[4,]$rsid` (*`r region19[4,]$genes`*; `r region19[4,]$ancestry`; p=`r formatC(region19[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region19[4,]$s, digits=3)`), associated with `r region19[4,]$gwascat` (`r region19[4,]$pubmed`).
+* `r region19[5,]$rsid` (*`r region19[5,]$genes`*; `r region19[5,]$ancestry`; p=`r formatC(region19[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region19[5,]$s, digits=3)`), associated with `r region19[5,]$gwascat` (`r region19[5,]$pubmed`).
+
+#### Peak 20: `r gene_names[20,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[20,]$genes`* locus, spanning `r gene_names[20,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region20[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region20[1,]$rsid` (*`r region20[1,]$genes`*; `r region20[1,]$ancestry`; p=`r formatC(region20[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region20[1,]$s, digits=3)`), associated with `r region20[1,]$gwascat` (`r region20[1,]$pubmed`).
+* `r region20[2,]$rsid` (*`r region20[2,]$genes`*; `r region20[2,]$ancestry`; p=`r formatC(region20[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region20[2,]$s, digits=3)`), associated with `r region20[2,]$gwascat` (`r region20[2,]$pubmed`).
+* `r region20[3,]$rsid` (*`r region20[3,]$genes`*; `r region20[3,]$ancestry`; p=`r formatC(region20[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region20[3,]$s, digits=3)`), associated with `r region20[3,]$gwascat` (`r region20[3,]$pubmed`).
+* `r region20[4,]$rsid` (*`r region20[4,]$genes`*; `r region20[4,]$ancestry`; p=`r formatC(region20[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region20[4,]$s, digits=3)`), associated with `r region20[4,]$gwascat` (`r region20[4,]$pubmed`).
+* `r region20[5,]$rsid` (*`r region20[5,]$genes`*; `r region20[5,]$ancestry`; p=`r formatC(region20[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region20[5,]$s, digits=3)`), associated with `r region20[5,]$gwascat` (`r region20[5,]$pubmed`).
+
+
+#### Peak 21: `r gene_names[21,]$genes`
+
+<font size="2">**Figure XX.** Selection at the *`r gene_names[21,]$genes`* locus, spanning `r gene_names[21,]$merged_peaks`. Results for the pan-ancestry analysis (ALL) plus the four marginal ancestries: Western hunter-gatherers (WHG), Eastern hunter-gatherers (EHG), Caucasus hunter-gatherers (CHG) and Anatolian farmers (ANA). Row one shows zoomed Manhattan plots of the p-values for each ancestry (significant SNPs sized by their selection coefficients), and row two shows allele trajectories for the top SNPs across all ancestries.</font>
+
+The first peak spanned the region `r region21[1,]$merged_peaks`, with the most significant SNPs being:
+
+* `r region21[1,]$rsid` (*`r region21[1,]$genes`*; `r region21[1,]$ancestry`; p=`r formatC(region21[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(region21[1,]$s, digits=3)`), associated with `r region21[1,]$gwascat` (`r region21[1,]$pubmed`).
+* `r region21[2,]$rsid` (*`r region21[2,]$genes`*; `r region21[2,]$ancestry`; p=`r formatC(region21[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(region21[2,]$s, digits=3)`), associated with `r region21[2,]$gwascat` (`r region21[2,]$pubmed`).
+* `r region21[3,]$rsid` (*`r region21[3,]$genes`*; `r region21[3,]$ancestry`; p=`r formatC(region21[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(region21[3,]$s, digits=3)`), associated with `r region21[3,]$gwascat` (`r region21[3,]$pubmed`).
+* `r region21[4,]$rsid` (*`r region21[4,]$genes`*; `r region21[4,]$ancestry`; p=`r formatC(region21[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(region21[4,]$s, digits=3)`), associated with `r region21[4,]$gwascat` (`r region21[4,]$pubmed`).
+* `r region21[5,]$rsid` (*`r region21[5,]$genes`*; `r region21[5,]$ancestry`; p=`r formatC(region21[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(region21[5,]$s, digits=3)`), associated with `r region21[5,]$gwascat` (`r region21[5,]$pubmed`).
+
+
+
+
+ 

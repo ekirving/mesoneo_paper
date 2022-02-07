@@ -1,0 +1,7 @@
+[tool.snakefmt]
+line-length = 120
+include = '\.smk$|^Snakefile|\.py$'
+exclude = 'scripts/ensembl_annotation.py|scripts/ensembl_variation.py'
+
+# snakefmt passes these options on to black
+[tool.black]

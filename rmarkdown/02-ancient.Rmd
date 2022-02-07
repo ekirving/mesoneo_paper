@@ -1,0 +1,161 @@
+---
+title: "Selection in aDNA Time Series"
+output:
+  html_notebook:
+    df_print: paged
+    code_folding: hide
+  html_document:
+    df_print: paged
+    code_folding: hide
+---
+# Selection in aDNA Time Series
+
+```{r}
+# get only the ancient ALL ancestry models
+ancient_all <- filter(clues, mode == "Ancient" && ancestry == "ALL")
+
+# annotate peaks
+peaks <- annotate_peaks(ancient_all, ancient_all_peaks, mathieson_peaks)
+
+# count the number of SNPs in each group
+num_gwas <- nrow(filter(peaks$data, type == "GWAS"))
+num_control <- nrow(filter(peaks$data, type == "Control"))
+
+# calculate the Bonferroni significance threshold
+p.bonferroni <- 0.05 / num_gwas
+
+# get the genome-wide and Bonferroni significant SNPs
+snps_genomewide <- filter(peaks$data, p.value < p.genomewide)
+snps_bonferroni <- filter(peaks$data, p.value < p.bonferroni)
+
+# the columns to use for results tables
+table_cols <- c("region", "peak", "rsid", "type", "chrom", "pos", "genes", "gwascat", "logLR", "p.value", "s")
+```
+
+Using a genome-wide significance threshold of `r formatC(p.genomewide, format = "e", digits = 0)`, we detect:
+
+* `r nrow(filter(snps_genomewide, type=='GWAS'))` significant SNPs in the GWAS group (n=`r num_gwas`)
+* `r nrow(filter(snps_genomewide, type=='Control'))` significant SNPs in the Control group (n=`r num_control`)
+
+Using a Bonferroni corrected significance threshold of `r formatC(p.bonferroni, format = "e", digits = 2)`, we detect:
+
+* `r nrow(filter(snps_bonferroni, type=='GWAS'))` significant SNPs in the GWAS group (n=`r num_gwas`)
+* `r nrow(filter(snps_bonferroni, type=='Control'))` significant SNPs in the Control group (n=`r num_control`)
+
+```{r fig2, fig.width = 12, fig.height = 6.75}
+manhattan_plot(peaks$data, c("type"), p.genomewide, p.bonferroni, colors = ancestry_colors, size_snps=FALSE, wrap=TRUE)
+```
+
+**Figure XX.** Manhattan plot of the p-values from running CLUES on an aDNA time series from all West Eurasian samples in the imputed dataset, for (a) GWAS SNPs from the GWAS Catalog; and (b) Control SNPs, frequency paired with the GWAS SNPs.
+
+```{r}
+peaks$data %>%
+  filter(peak %in% c("known", "novel")) %>%
+  group_by(region) %>%
+  slice(which.min(p.value)) %>%
+  ungroup() %>%
+  select(all_of(table_cols)) %>%
+  arrange(chrom, pos) %>%
+  mutate_if(is.numeric, list(~ ifelse(. < 1, formatC(., format = "e", digits = 2), .))) %>%
+  kable(format = "html", caption = paste0("Table XX. ", length(peaks$all), " genome-wide significant peaks in aDNA time series (", length(peaks$novel), " novel and ", length(peaks$known), " previously characterised)")) %>%
+  kable_styling(bootstrap_options = c("striped", "responsive"))
+```
+
+```{r}
+peaks$data %>%
+  filter(peak %in% c("absent")) %>%
+  group_by(region) %>%
+  slice(which.min(p.value)) %>%
+  ungroup() %>%
+  select(all_of(table_cols)) %>%
+  arrange(chrom, pos) %>%
+  mutate_if(is.numeric, list(~ ifelse(. < 1, formatC(., format = "e", digits = 2), .))) %>%
+  kable(format = "html", caption = paste0("Table XX. ", length(peaks$absent), " previouly characterised peaks which were not significant in this analysis")) %>%
+  kable_styling(bootstrap_options = c("striped", "responsive"))
+```
+
+Similarly to the 1000G EUR analysis, the aDNA time series GWAS group is significantly enriched for selection when compared to the Control group:
+```{r}
+paired <- pairs %>%
+  inner_join(select(peaks$data, c(rsid, p.value)), by = c("gwas" = "rsid")) %>%
+  inner_join(select(peaks$data, c(rsid, p.value)), by = c("neutral" = "rsid"), suffix = c(".gwas", ".neutral"))
+
+wilcox <- wilcox.test(paired$p.value.gwas, paired$p.value.neutral, paired = TRUE, alternative = "less")
+wilcox
+```
+```{r}
+regions <- peaks$data %>%
+  filter(peak %in% c("known", "novel")) %>%
+  group_by(region) %>%
+  slice(which.min(p.value)) %>%
+  ungroup() %>%
+  arrange(chrom, start) %>%
+  mutate(gwascat=str_to_lower(gwascat))
+```
+
+#### Peak 1: `r regions[1,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[1,]$rsid`, the most significant SNP in the selection peak spanning `r regions[1,]$region`.</font> 
+
+The first peak spanned the region `r regions[1,]$region`, with the most significant SNP being `r regions[1,]$rsid` (*`r regions[1,]$genes`*; p=`r formatC(regions[1,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[1,]$s, digits=3)`), associated with `r regions[1,]$gwascat` (`r regions[1,]$pubmed`).
+
+#### Peak 2: `r regions[2,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[2,]$rsid`, the most significant SNP in the selection peak spanning `r regions[2,]$region`.</font>
+
+The second peak spanned the region `r regions[2,]$region`, with the most significant SNP being `r regions[2,]$rsid` (*`r regions[2,]$genes`*; p=`r formatC(regions[2,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[2,]$s, digits=3)`), associated with `r regions[2,]$gwascat` (`r regions[2,]$pubmed`).
+
+#### Peak 3: `r regions[3,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[3,]$rsid`, the most significant SNP in the selection peak spanning `r regions[3,]$region`.</font>
+
+The third peak spanned the region `r regions[3,]$region`, with the most significant SNP being `r regions[3,]$rsid` (*`r regions[3,]$genes`*; p=`r formatC(regions[3,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[3,]$s, digits=3)`), associated with `r regions[3,]$gwascat` (`r regions[3,]$pubmed`).
+
+#### Peak 4: `r regions[4,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[4,]$rsid`, the most significant SNP in the selection peak spanning `r regions[4,]$region`.</font>
+
+The fourth peak spanned the region `r regions[4,]$region`, with the most significant SNP being `r regions[4,]$rsid` (*`r regions[4,]$genes`*; p=`r formatC(regions[4,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[4,]$s, digits=3)`), associated with `r regions[4,]$gwascat` (`r regions[4,]$pubmed`).
+
+#### Peak 5: `r regions[5,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[5,]$rsid`, the most significant SNP in the selection peak spanning `r regions[5,]$region`.</font>
+
+The fifth peak spanned the region `r regions[5,]$region`, with the most significant SNP being `r regions[5,]$rsid` (*`r regions[5,]$genes`*; p=`r formatC(regions[5,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[5,]$s, digits=3)`), associated with `r regions[5,]$gwascat` (`r regions[5,]$pubmed`).
+
+#### Peak 6: `r regions[6,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[6,]$rsid`, the most significant SNP in the selection peak spanning `r regions[6,]$region`.</font>
+
+The sixth peak spanned the region `r regions[6,]$region`, with the most significant SNP being `r regions[6,]$rsid` (*`r regions[6,]$genes`*; p=`r formatC(regions[6,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[6,]$s, digits=3)`), associated with `r regions[6,]$gwascat` (`r regions[6,]$pubmed`).
+
+#### Peak 7: `r regions[7,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[7,]$rsid`, the most significant SNP in the selection peak spanning `r regions[7,]$region`.</font>
+
+The seventh peak spanned the region `r regions[7,]$region`, with the most significant SNP being `r regions[7,]$rsid` (*`r regions[7,]$genes`*; p=`r formatC(regions[7,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[7,]$s, digits=3)`), associated with `r regions[7,]$gwascat` (`r regions[7,]$pubmed`).
+
+#### Peak 8: `r regions[8,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[8,]$rsid`, the most significant SNP in the selection peak spanning `r regions[8,]$region`.</font>
+
+The eighth peak spanned the region `r regions[8,]$region`, with the most significant SNP being `r regions[8,]$rsid` (*`r regions[8,]$genes`*; p=`r formatC(regions[8,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[8,]$s, digits=3)`), associated with `r regions[8,]$gwascat` (`r regions[8,]$pubmed`).
+
+#### Peak 9: `r regions[9,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[9,]$rsid`, the most significant SNP in the selection peak spanning `r regions[9,]$region`.</font>
+
+The ninth peak spanned the region `r regions[9,]$region`, with the most significant SNP being `r regions[9,]$rsid` (*`r regions[9,]$genes`*; p=`r formatC(regions[9,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[9,]$s, digits=3)`), associated with `r regions[9,]$gwascat` (`r regions[9,]$pubmed`).
+
+#### Peak 10: `r regions[10,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[10,]$rsid`, the most significant SNP in the selection peak spanning `r regions[10,]$region`.</font>
+
+The tenth peak spanned the region `r regions[10,]$region`, with the most significant SNP being `r regions[10,]$rsid` (*`r regions[10,]$genes`*; p=`r formatC(regions[10,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[10,]$s, digits=3)`), associated with `r regions[10,]$gwascat` (`r regions[10,]$pubmed`).
+
+#### Peak 11: `r regions[11,]$genes`
+
+<font size="2">**Figure XX.** CLUES plot of the aDNA time series analysis for all West Eurasian samples in the imputed dataset, showing the posterior probability of the derived allele frequency trajectory for `r regions[11,]$rsid`, the most significant SNP in the selection peak spanning `r regions[11,]$region`.</font>
+
+The eleventh peak spanned the region `r regions[11,]$region`, with the most significant SNP being `r regions[11,]$rsid` (*`r regions[11,]$genes`*; p=`r formatC(regions[11,]$p.value, format = "e", digits = 2)`; s=`r formatC(regions[11,]$s, digits=3)`), associated with `r regions[11,]$gwascat` (`r regions[11,]$pubmed`).
+

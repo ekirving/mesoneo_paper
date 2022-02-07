@@ -1,0 +1,91 @@
+---
+title: "Results v0.2"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+  html_notebook:
+    df_print: paged
+    code_folding: hide
+---
+```{r}
+library(data.table)
+library(googlesheets4)
+library(kableExtra)
+library(knitr)
+library(purrr)
+library(rsconnect)
+
+# load some helper functions
+source("../scripts/clues_utils.R")
+
+clues_tsv <- "../clues/ancestral_paths_new-all-filtered-clues_report.tsv"
+clues_mod_tsv <- "../clues/ancestral_paths_new-all-modern-ALL-clues_report.tsv"
+pairs_tsv <- "../variants/ancestral_paths_new-all-pairs.tsv"
+unmapped_tsv <- "../relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_unmapped.tsv.gz"
+flipped_tsv <- "../relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_flipped.tsv.gz"
+
+clues <- load_clues(clues_tsv, pairs_tsv, unmapped_tsv, flipped_tsv)
+modern_all <- load_clues(clues_mod_tsv, pairs_tsv, unmapped_tsv, flipped_tsv)
+
+# Manhattan Harvester results for each of the CLUES analysis groups (i.e. modern, ancient, WHG, EHG, CHG and ANA)
+modern_all_peaks <- fread("../clues/ancestral_paths_new-all-modern-ALL-harvester.tsv", header = T, sep = "\t", check.names = T)
+ancient_all_peaks <- fread("../clues/ancestral_paths_new-all-ancient-ALL-filtered-harvester.tsv", header = T, sep = "\t", check.names = T)
+ancient_whg_peaks <- fread("../clues/ancestral_paths_new-all-ancient-WHG-filtered-harvester.tsv", header = T, sep = "\t", check.names = T)
+ancient_ehg_peaks <- fread("../clues/ancestral_paths_new-all-ancient-EHG-filtered-harvester.tsv", header = T, sep = "\t", check.names = T)
+ancient_chg_peaks <- fread("../clues/ancestral_paths_new-all-ancient-CHG-filtered-harvester.tsv", header = T, sep = "\t", check.names = T)
+ancient_ana_peaks <- fread("../clues/ancestral_paths_new-all-ancient-ANA-filtered-harvester.tsv", header = T, sep = "\t", check.names = T)
+
+# the GWAS/Control pairings
+pairs <- fread("../variants/ancestral_paths_new-all-pairs.tsv", header = T, sep = "\t")
+
+# all the SNPs from Mathieson et al. 2015
+mathieson_snps <- fread("../data/mathieson/41586_2015_BFnature16152_MOESM270_ESM.txt", header = T, sep = "\t")
+
+# the 12 reported peaks in Mathieson et al. 2015
+mathieson_reported_peaks <- fread("../data/mathieson/41586_2015_Article_BFnature16152_Figc_ESM.txt",
+  header = T, sep = "\t", col.names = c("rsid", "chrom", "pos", "p.old", "range", "genes", "function")
+) %>% select("rsid", "chrom", "genes", "function")
+
+# Manhattan Harvester results for the reported p-values in Mathieson_et_al_2015
+mathieson_peaks <- fread("../mathieson/mathieson-harvester.tsv", header = T, sep = "\t", check.names = T)
+
+# the three sets of ancestry peaks from Alba's PCAdapt analysis
+pcadapt_eurasia <- fread("../data/alba/Eurasia_k3.tsv", header = T, sep = "\t", check.names = T)
+pcadapt_west_eu <- fread("../data/alba/west-eurasia.pcadapt-k3.tsv", header = T, sep = "\t", check.names = T)
+pcadapt_hg_neo  <- fread("../data/alba/west-Eurasia.Hg-neo.tsv", header = T, sep = "\t", check.names = T)
+
+# concatenate all the PCAdapt regions
+pcadapt_peaks <- bind_rows(
+  pcadapt_eurasia,
+  pcadapt_west_eu,
+  pcadapt_hg_neo,
+) %>% 
+  mutate(chrom=chr, range=paste0(start, "-", end)) %>%
+  select("chrom", "range")
+
+# CLUES results from the 381 genome-wide significant SNPs from Mathieson_et_al_2015
+mathieson_clues <- fread("../mathieson/ancestral_paths_new-all-mathieson_report.tsv", header = T, sep = "\t")
+
+# use a genome-wide significance threshold
+p.genomewide <- 5e-8
+
+# color brewer https://colorbrewer2.org/#type=qualitative&scheme=Set2&n=5
+ancestry_colors <- c(
+  "ALL" = "#66c2a5",
+  "WHG" = "#fc8d62",
+  "EHG" = "#8da0cb",
+  "CHG" = "#e78ac3",
+  "ANA" = "#a6d854"
+)
+
+```
+
+```{r child="01-modern.Rmd"}
+```
+
+```{r child="02-ancient.Rmd"}
+```
+
+```{r child="03-ancestries.Rmd"}
+```

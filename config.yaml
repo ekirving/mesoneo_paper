@@ -1,0 +1,93 @@
+# analysis groups
+samples:
+
+  ancestral_paths_new:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
+    genotypes: data/Ancestral_paths_new/ancestral_paths_merged_filtered.bcf
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  chr3_true_paths:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/simulation_metadata.tsv
+    genotypes: data/Ancestral_paths_new/chr3_simulated_true_painted.vcf.gz
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  chr3_inferred_paths:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/simulation_metadata.tsv
+    genotypes: data/Ancestral_paths_new/chr3_simulated_inferred_painted.vcf.gz
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  imputed_unfiltered:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
+    genotypes: unfiltered/ancestral_paths_new-all-chrALL-unfiltered-1000G.bcf
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  neo_likelihoods:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
+    genotypes: data/neo.likelihoods/neo.likelihoods_merge.bcf
+    is_haploid: False
+    is_likelihood: True
+    populations:
+      all: {}
+
+# list of chroms in GRCh37
+chroms: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+
+1000G:
+  pop_labels: data/1000G/1000G.poplabels
+  vcf_path: data/1000G/vcf/
+  anc_path: data/1000G/anc/
+  mask_path: data/1000G/mask/
+  map_path: data/1000G/map/
+
+imputed:
+  vcf_path: /willerslev/users-shared/science-snm-willerslev-wl4sn3/step3_postprocessing/step5_release/15062020/
+
+andres:
+  targets: data/andres/subset.gwascatalog.clinvar.merged.final.list.tsv
+
+inv17_h1h2:
+  targets: data/andres/inv17_h1h2_snps.txt
+
+mathieson:
+  targets: data/mathieson/41586_2015_BFnature16152_MOESM270_ESM.txt
+
+# reference effective population size to scale c14 dates into diffusion units
+nref: 10000
+
+# average generation time in years
+gen_time: 28
+
+relate:
+  path: ../relate/
+
+  # human mutation rate
+  mu: 1.25e-8
+
+  # effective population size
+  Ne: 30000
+
+  # number of times branch lengths are sampled
+  num_samples: 100
+
+clues:
+  path: ../clues/
+
+harvester:
+  path: ../harvester/
