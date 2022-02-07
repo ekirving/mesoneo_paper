@@ -80,6 +80,7 @@ rule clues_inference_ancient:
         " --coal {input.coal}"
         " --{params.flag} {input.anc}"
         " --timeBins {input.bins}"
+        " --betaParam 0.5"
         " --out {params.output} &> {log}"
 
 
@@ -134,6 +135,7 @@ rule clues_inference_modern:
         " --coal {input.coal}"
         " --popFreq {params.daf}"
         " --timeBins {input.bins}"
+        " --betaParam 0.5"
         " --out {params.output} &> {log}"
 
 
@@ -176,6 +178,7 @@ rule clues_inference_both:
         " --popFreq {params.daf}"
         " --ancientSamps {input.anc}"
         " --timeBins {input.bins}"
+        " --betaParam 0.5"
         " --out {params.output} &> {log}"
 
 
