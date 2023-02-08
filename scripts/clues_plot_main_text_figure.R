@@ -37,6 +37,28 @@ ancestries <- c("ALL", "WHG", "EHG", "CHG", "ANA")
 # load all the CLUES results
 clues <- load_clues(argv$data, argv$pairs, argv$unmapped, argv$flipped)
 
+# ----------------------------------------------------------------------------------------------------------------
+
+# get the extra models for `rs1438307`
+extra_snp <- read_tsv("rs1438307-report.tsv", col_types = cols()) %>%
+    rename(rsid=rsid_x) %>%
+    select(-c(derived, minor, rsid_y))
+
+# calculate p-values from the log-likelihood ratio
+extra_snp$p.value <- pchisq(extra_snp$logLR, df = 1, lower.tail = FALSE)
+
+# determine if SNPs are GWAS or controls
+extra_snp$type <- "gwas"
+
+# set facet ordering
+extra_snp$mode <- factor(extra_snp$mode, levels = c("modern", "ancient"), labels = c("Modern", "Ancient"))
+extra_snp$type <- factor(extra_snp$type, levels = c("gwas", "control"), labels = c("GWAS", "Control"))
+extra_snp$ancestry <- factor(extra_snp$ancestry, levels = c("ALL", "WHG", "EHG", "CHG", "ANA"))
+
+clues <- bind_rows(clues, extra_snp)
+
+# ----------------------------------------------------------------------------------------------------------------
+
 # Manhattan Harvester results for each of the CLUES analysis groups (i.e. modern, ancient, WHG, EHG, CHG and ANA)
 ancient_all_peaks <- suppressWarnings(read_tsv(argv$peaks_all, col_types = cols()))
 ancient_whg_peaks <- suppressWarnings(read_tsv(argv$peaks_whg, col_types = cols()))
@@ -162,10 +184,21 @@ top_marginal_snps <- peaks_joined %>%
 plt_columns <- lapply(focal_regions, function(focal_region) {
 
   # get all the SNPs in this region
-  region_data <- filter(peaks_joined, merged_peaks == focal_region)
+  region_data <- filter(peaks_joined, merged_peaks == focal_region) %>%
+      # remove rs12465802
+      filter(rsid != "rs12465802")
 
   # get the list of top SNPs in the region
   region_snps <- filter(top_marginal_snps, merged_peaks == focal_region)$rsid
+
+  # ----------------------------------------------------------------------------------------------------------------
+
+  if (focal_region == "chr2:135300859-137564020") {
+    # add the extra SNP
+    region_snps <- c(region_snps, "rs1438307")
+  }
+
+  # ----------------------------------------------------------------------------------------------------------------
 
   # pair the colours with the ordered top SNPs
   label_colors <- setNames(snp_colors[1:length(region_snps)], region_snps)

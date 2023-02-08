@@ -39,6 +39,8 @@ def variant_label(vcf_file, meta_file, output_file):
         # variant not in the VCF
         raise RuntimeError("SNP {}:{} not found in {}".format(metadata["chrom"], metadata["start"], vcf_file))
 
+    alleles = [rec.ref] + list(rec.alts)
+
     if metadata.get("genes", "") == "":
         metadata["genes"] = "N/A"
     else:

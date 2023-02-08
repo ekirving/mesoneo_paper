@@ -10,7 +10,7 @@ import json
 from multiprocessing import cpu_count
 
 from psutil import virtual_memory
-from snakemake.io import directory, expand, protected, temp, unpack
+from snakemake.io import directory, expand, protected, temp, unpack, ancient
 
 from scripts.utils import trim_ext
 
@@ -75,7 +75,7 @@ rule relate_flip_haps_using_ancestor:
     input:
         haps="haps/{panel}_chr{chr}_biallelic.haps",
         smpl="haps/{panel}_chr{chr}.sample",
-        anc=config["1000G"]["anc_path"] + "{chr}.humanc_e71.fa",
+        anc=ancient(config["1000G"]["anc_path"] + "{chr}.humanc_e71.fa"),
     output:
         haps=temp("haps/{panel}_chr{chr}_ancestral.haps"),
     log:
@@ -116,7 +116,7 @@ rule relate_generate_snp_annotations:
     input:
         haps="haps/{panel}_chr{chr}.haps",
         smpl="haps/{panel}_chr{chr}.sample",
-        anc=config["1000G"]["anc_path"] + "{chr}.humanc_e71.fa",
+        anc=ancient(config["1000G"]["anc_path"] + "{chr}.humanc_e71.fa"),
     output:
         annot="haps/{panel}_chr{chr}.annot",
     log:

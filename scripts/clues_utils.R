@@ -57,7 +57,7 @@ load_clues <- function(clues_tsv, pairs_tsv, unmapped_tsv, flipped_tsv) {
   ) %>%
     inner_join(clues, by = "rsid") %>%
     select("pair", "mode", "ancestry") %>%
-    inner_join(clues, ., by = c("rsid" = "pair", "mode", "ancestry"), keep = TRUE)
+    inner_join(clues, ., by = c("rsid" = "pair", "mode", "ancestry"))
 
   # tidy up gene name duplicates
   clues <- clues %>%
@@ -187,8 +187,8 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
     data$show_label <- FALSE
   }
 
-  if (!("merged_peaks" %in% colnames(data))) {
-    data <- mutate(data, merged_peaks = ifelse(peak != "absent", region, NA))
+  if ( !("merged_peaks" %in% colnames(data)) ) {
+      data <- mutate(data, merged_peaks=ifelse(peak != "absent", region, NA))
   }
 
   data <- data %>%

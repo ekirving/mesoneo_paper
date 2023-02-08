@@ -82,7 +82,9 @@ def clues_report(data_tsv, columns, info_tsv, dataset, population, mode, ancestr
     # convert to a df
     df = pd.DataFrame(rows)
     df["chrom"] = df.chrom.astype("int64")
-    df["p.value"] = df["logLR"].apply(lambda logLR: chi2.sf(logLR, 1))
+    # convert the log-likelihood ratio into a p-value
+    # https://en.wikipedia.org/wiki/Wilks%27_theorem
+    df["p.value"] = df["logLR"].apply(lambda logLR: chi2.sf(2 * logLR, 1))
 
     # avoid duplicate column
     info.drop("rsid", axis=1)

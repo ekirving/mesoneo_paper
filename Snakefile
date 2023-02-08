@@ -29,6 +29,7 @@ include: "rules/inv17_h1h2.smk"
 include: "rules/relate.smk"
 include: "rules/clues.smk"
 include: "rules/mathieson.smk"
+include: "rules/binned.smk"
 
 
 CLUES_MODES = ["ancient", "modern", "both"]

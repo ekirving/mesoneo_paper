@@ -7,6 +7,7 @@ __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
 import sys
+from itertools import repeat
 
 import click
 import pandas as pd
