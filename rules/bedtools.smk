@@ -6,6 +6,8 @@ __copyright__ = "Copyright 2020, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
+from snakemake.io import ancient
+
 # pad all non-neutral loci by +/- 100 kb
 NON_NEUTRAL_BUFFER = 50000
 
@@ -53,7 +55,7 @@ rule bedtools_neutral_loci:
 rule bedtools_neutral_strict:
     input:
         bed="bed/{reference}-neutral.bed",
-        mask=config["1000G"]["mask_path"] + "20141020.strict_mask.whole_genome.bed",
+        mask=ancient(config["1000G"]["mask_path"] + "20141020.strict_mask.whole_genome.bed"),
     output:
         "bed/{reference}-neutral_strict.bed",
     shell:

@@ -6,12 +6,15 @@ __copyright__ = "Copyright 2020, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
-from snakemake.io import expand, protected, temp
+from snakemake.io import expand, protected, temp, ancient
 
 
 rule tgp_1000g_ancestral_chr:
     input:
-        config["1000G"]["vcf_path"] + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.gz",
+        ancient(
+            config["1000G"]["vcf_path"]
+            + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz"
+        ),
     output:
         temp("1000G/1000G_chr{chr}_ancestral.tsv"),
     shell:

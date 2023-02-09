@@ -17,7 +17,7 @@ See https://github.com/35ajstern/clues/
 import gzip
 import json
 
-from snakemake.io import expand, protected, temp, unpack
+from snakemake.io import expand, protected, temp, unpack, ancient
 
 from scripts.utils import trim_ext, get_modern_pops
 
@@ -69,8 +69,10 @@ rule clues_inference_ancient:
         anc="clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-{ancestry}-{sex}.ancient",
         freq="clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-{ancestry}-{sex}.freq",
         bins="clues/{dataset}-{population}-time.bins",
-        coal=lambda wildcards: "relate/{panel}-{pops}-popsize.coal".format(
-            panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
+        coal=lambda wildcards: ancient(
+            "relate/{panel}-{pops}-popsize.coal".format(
+                panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
+            )
         ),
     output:
         epochs="clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ancient-{ancestry}-{sex}.epochs.npy",
@@ -302,7 +304,6 @@ rule clues_manhattan_harvester:
         " -lcolumn 2"
         " -pcolumn 3"
         " -inlimit 0.01"
-        " -peak-limit 5.87"
         " -file {input}"
         " -out {output.tmp} &> {log} && "
         "awk -F'\\t' 'BEGIN {{OFS=FS}} NR>1 {{split($3, range, \"-\"); $3=range[1]*10\"-\"range[2]*10}} {{print $0}}'"

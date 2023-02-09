@@ -41,7 +41,7 @@ f, ax = plt.subplots(1, 1)
 f.set_size_inches(20, 10)
 
 xmin = int(min(epochs))
-xmax = min(int(max(epochs)), round(13665 / args.gen_time))  # TODO parameterize this
+xmax = min(int(max(epochs)), round(13665 / args.gen_time))
 
 xticks = range(xmin, xmax + 1, round(1000 / args.gen_time))
 

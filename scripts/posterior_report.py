@@ -46,7 +46,6 @@ def posterior_distance(dataset1, population1, dataset2, population2, snp_type, r
     # the trajectories may not be the same length, so only compare overlapping epochs
     num_epochs = posterior1.shape[1] if posterior1.shape < posterior2.shape else posterior2.shape[1]
 
-    # TODO adjust this for the true height of the frequency bin
     # make a cost matrix with a linear transport distance penalty
     cost_matrix = [[abs(i - j) for i in range(num_freqs)] for j in range(num_freqs)]
 

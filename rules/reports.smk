@@ -6,6 +6,8 @@ __copyright__ = "Copyright 2020, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
+from snakemake.io import ancient
+
 
 rule bcftools_snp_freqs:
     input:
@@ -51,7 +53,7 @@ rule variant_report_population:
 checkpoint variant_strict_report:
     input:
         bed="variants/{dataset}-{population}_report.bed",
-        mask=config["1000G"]["mask_path"] + "20141020.strict_mask.whole_genome.bed",
+        mask=ancient(config["1000G"]["mask_path"] + "20141020.strict_mask.whole_genome.bed"),
     output:
         bed="variants/{dataset}-{population}_report_strict.bed",
     shell:

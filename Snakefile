@@ -201,7 +201,7 @@ def run_all_locus(_):
     dataset = config.get("dataset", "ancestral_paths_new")
     population = config.get("population", "all")
     locus = config.get("locus", "chr17:25869029-48635050")
-    batch = config.get("batch", "1")
+    batch = config.get("batch", 1)
 
     vcf_file = config["samples"][dataset]["genotypes"]
 

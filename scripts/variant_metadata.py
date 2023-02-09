@@ -103,7 +103,7 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
     # load the 1000G VCF and check the alleles
     cmd = (
         r"bcftools view --types snps --max-alleles 2 "
-        r" {path}/ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.gz {chr}:{pos} | "
+        r" {path}/ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz {chr}:{pos} | "
         r"bcftools query --format '%REF %ALT'".format(
             path=config["1000G"]["vcf_path"], chr=mapping.get("seq_region_name"), pos=mapping.get("start")
         )

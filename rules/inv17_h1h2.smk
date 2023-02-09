@@ -6,7 +6,7 @@ __copyright__ = "Copyright 2020, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
-from snakemake.io import expand, temp
+from snakemake.io import expand, temp, ancient
 
 from scripts.utils import get_modern_samples, get_ancient_samples
 
@@ -14,8 +14,9 @@ from scripts.utils import get_modern_samples, get_ancient_samples
 rule bcftools_1000G:
     # 1000G phase 3 callset
     input:
-        vcf=(
-            config["1000G"]["vcf_path"] + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.gz"
+        vcf=ancient(
+            config["1000G"]["vcf_path"]
+            + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz"
         ),
     output:
         vcf=temp("unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf"),

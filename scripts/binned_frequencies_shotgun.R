@@ -9,8 +9,12 @@ quiet <- function(x) {
     suppressMessages(suppressWarnings(x))
 }
 quiet(library(argparser))
-quiet(library(tidyverse))
+quiet(library(dplyr))
+quiet(library(ggplot2))
+quiet(library(readr))
+quiet(library(tidyr))
 quiet(library(directlabels))
+quiet(library(Hmisc))
 
 # get the command line arguments
 p <- arg_parser("Plot the binned allele frequencies for a SNP")
@@ -62,10 +66,14 @@ binned <- geno %>%
     # add a new age bin
     mutate(bin=-round(ageAverage/BIN_SIZE)*BIN_SIZE) %>%
     group_by(rsid, type, bin) %>%
-    summarise(sum=sum(derived), count=n(), daf=sum/count) %>%
+    summarise(sum=sum(derived), count=n()) %>%
     mutate(type=ifelse(type=="gl",
                        paste0("Non-imputed calls (n=", sample_size_gl," ancient samples)"),
                        paste0("Imputed calls (n=", sample_size_impute," ancient samples)")))
+
+# calculate the binomial proportion confidence interval
+binned <- bind_cols(binned, binconf(x=binned$sum, n=binned$count, alpha=0.05, return.df=TRUE)) %>%
+    rename(daf=PointEst, ci_lower=Lower, ci_upper=Upper)
 
 # constrain the extent of the plotting
 xmin <- min(binned$bin)
@@ -77,10 +85,12 @@ size_min <- floor(min(binned$count) / 100) * 100
 size_max <- ceiling(max(binned$count) / 100) * 100
 size_breaks <- 2^(1:ceiling(log2(size_max)))
 
-ggplot(binned, aes(x=bin, y=daf, color=rsid)) +
+ggplot(binned, aes(x=bin, y=daf, color=rsid, weight=count)) +
 
     geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) +
-    geom_point(aes(size=count), alpha=.8, position=position_dodge(width = 300)) +
+    geom_point(aes(size=count), alpha=.8, position=position_dodge(width = 200)) +
+    geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width=200, position=position_dodge(width = 200)) +
+    
     facet_wrap(~type) +
 
     guides(size=guide_legend(title="Genotype count")) +
@@ -90,6 +100,8 @@ ggplot(binned, aes(x=bin, y=daf, color=rsid)) +
 
     ylab("DAF") +
     xlab("kyr BP") +
+
+    coord_cartesian(ylim=c(0, max(binned$ci_upper))) +
 
     # basic styling
     theme_minimal() +

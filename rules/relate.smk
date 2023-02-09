@@ -36,8 +36,9 @@ RELATE_ALL_SNPS = 1
 
 rule relate_convert_vcf:
     input:
-        vcf=(
-            config["1000G"]["vcf_path"] + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.gz"
+        vcf=ancient(
+            config["1000G"]["vcf_path"]
+            + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz"
         ),
     output:
         haps=temp("haps/{panel}_chr{chr}_convert.haps"),
@@ -95,7 +96,7 @@ rule relate_filter_haps_using_mask:
     input:
         haps="haps/{panel}_chr{chr}_ancestral.haps",
         smpl="haps/{panel}_chr{chr}.sample",
-        mask=config["1000G"]["mask_path"] + "StrictMask/20140520.chr{chr}.strict_mask.fasta",
+        mask=ancient(config["1000G"]["mask_path"] + "StrictMask/20140520.chr{chr}.strict_mask.fasta"),
     output:
         haps="haps/{panel}_chr{chr}.haps",
         dist="haps/{panel}_chr{chr}.dist",
@@ -163,7 +164,7 @@ rule relate_parallel:
     input:
         haps="haps/{panel}_chr{chr}.haps",
         smpl="haps/{panel}_chr{chr}.sample",
-        map=config["1000G"]["map_path"] + "genetic_map_chr{chr}_combined_b37.txt",
+        map=ancient(config["1000G"]["map_path"] + "genetic_map_chr{chr}_combined_b37.txt"),
         dist="haps/{panel}_chr{chr}.dist",
         annot="haps/{panel}_chr{chr}.annot",
     output:
