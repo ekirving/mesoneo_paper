@@ -16,7 +16,7 @@ dependencies:
   - numpy=1.19.2
   - pandas=1.1.3
   - pip=20.2.4
-  - plink=1.90b6.2
+  - plink=1.90b6.21
   - pot=0.7.0
   - progressbar=2.5
   - pysam=0.16.0.1

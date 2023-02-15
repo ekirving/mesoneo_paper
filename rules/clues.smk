@@ -6,6 +6,14 @@ __copyright__ = "Copyright 2020, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
+"""
+CLUES analyses
+
+Rules for inference of allele frequency trajectories and selection coefficients with CLUES.
+
+See https://github.com/35ajstern/clues/
+"""
+
 import gzip
 import json
 
@@ -75,7 +83,8 @@ rule clues_inference_ancient:
         daf=lambda wildcards, input: open(str(input.freq)).read().strip(),
         flag=lambda wildcards: "ancientSamps" if wildcards.ancestry == "ALL" else "ancientHaps",
     shell:
-        "python {config[clues][path]}/inference.py"
+        "python bin/clues/inference.py"
+        " --lik"
         " --popFreq {params.daf}"
         " --coal {input.coal}"
         " --{params.flag} {input.anc}"
@@ -129,7 +138,7 @@ rule clues_inference_modern:
         daf=lambda wildcards, input: open(str(input.freq)).read().strip(),
         allele=get_relate_allele,
     shell:
-        "python {config[clues][path]}/inference.py"
+        "python bin/clues/inference.py"
         " --A1 {params.allele}"
         " --times {params.input}"
         " --coal {input.coal}"
@@ -152,7 +161,7 @@ def clues_inference_both_inputs(wildcards):
         "bins": expand("clues/{dataset}-{population}-time.bins", **params),
         "coal": expand("relate/{panel}-{pops}-popsize.coal", **params),
         "timeb": expand("relate/{panel}/{pops}/{rsid}/{panel}-{pops}-popsize-allsnps-{rsid}.timeb", **params),
-        "meta": expand("variants/metadata/{reference}/{{rsid}}.json", **params),
+        "meta": ancient(expand("variants/metadata/{reference}/{{rsid}}.json", **params)),
     }
 
 
@@ -171,7 +180,7 @@ rule clues_inference_both:
         daf=lambda wildcards, input: open(str(input.freq)).read().strip(),
         allele=get_relate_allele,
     shell:
-        "python {config[clues][path]}/inference.py"
+        "python bin/clues/inference.py"
         " --A1 {params.allele}"
         " --times {params.input}"
         " --coal {input.coal}"
