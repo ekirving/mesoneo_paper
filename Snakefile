@@ -30,6 +30,7 @@ include: "rules/relate.smk"
 include: "rules/clues.smk"
 include: "rules/mathieson.smk"
 include: "rules/binned.smk"
+include: "rules/map.smk"
 
 
 CLUES_MODES = ["ancient", "modern", "both"]
@@ -235,6 +236,7 @@ rule all:
     # produce all the selection reports and pick peaks with manhattan harvester
     input:
         "figs/ancestral_paths_new-all-filtered-main_figure.png",
+        "figs/ancestral_paths_new-samples_map.png",
 
 
 rule ancestries:

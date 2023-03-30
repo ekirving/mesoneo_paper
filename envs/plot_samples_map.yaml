@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-argparser=0.7.1
+  - r-base=4.2.3
+  - r-base64enc=0.1_3
+  - r-ggdist=3.2.1
+  - r-gghalves=0.1.4
+  - r-ggpubr=0.6.0
+  - r-ggthemes=4.2.4
+  - r-rgeos=0.6_2
+  - r-rnaturalearth=0.3.2
+  - r-rnaturalearthdata=0.1.0
+  - r-sf=1.0_12
+  - r-styler=1.9.1
+  - r-tidyquant=1.0.6
+  - r-tidyverse=2.0.0
+  - r-viridis=0.6.2
+  - r-viridislite=0.4.1
