@@ -20,7 +20,7 @@ for isoform in "${ISOFORMS[@]}"; do
     --popFreq `cat "apoe/${isoform}.freq"` \
     --coal relate/1000G_phase3-FIN_GBR_TSI-popsize.coal \
     --ancientHaps "apoe/${isoform}.ancient" \
-    --timeBins clues/ancestral_paths_new-all-time.bins \
+    --timeBins clues/ancestral_paths_v3-all-time.bins \
     --betaParam 0.5  \
     --out "apoe/${isoform}" &> "apoe/${isoform}.log"
 

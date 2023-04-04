@@ -11,7 +11,7 @@ quiet <- function(x) {
 quiet(library(tidyverse))
 
 # load the sample metadata
-samples <- read_tsv("data/Ancestral_paths_new/ancestral_paths_merged_filtered.sampleInfo.tsv", col_types = cols()) %>%
+samples <- read_tsv("data/ancestral_paths_v3/ancestral_paths_merged_filtered.sampleInfo.tsv", col_types = cols()) %>%
     select(sampleId, ageAverage)
 
 # load the GLs

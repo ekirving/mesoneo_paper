@@ -75,7 +75,7 @@ def get_paired_snps(dataset, population, snp_type, chrom=None):
 
 
 def run_all_ancestries(_):
-    dataset = config.get("dataset", "ancestral_paths_new")
+    dataset = config.get("dataset", "ancestral_paths_v3")
     population = config.get("population", "all")
     ancestry = config.get("ancestry", "ALL")
     snp_type = config.get("type", "gwas")
@@ -103,7 +103,7 @@ def get_unmapped():
 
 
 def run_all_moderns(_):
-    dataset = config.get("dataset", "ancestral_paths_new")
+    dataset = config.get("dataset", "ancestral_paths_v3")
     population = config.get("population", "all")
     snp_type = config.get("type", "gwas")
 
@@ -140,9 +140,9 @@ def run_all_andres(_):
 
 
 def run_all_inv17_h1h2(_):
-    dataset = config.get("dataset", "ancestral_paths_new")
+    dataset = config.get("dataset", "ancestral_paths_v3")
     population = config.get("population", "all")
-    ancestries = ANCESTRIES if dataset == "ancestral_paths_new" else "ALL"
+    ancestries = ANCESTRIES if dataset == "ancestral_paths_v3" else "ALL"
 
     # load the list of SNPs supplied by Andrés
     data = pd.read_table(config["inv17_h1h2"]["targets"])
@@ -168,7 +168,7 @@ def run_all_inv17_h1h2(_):
 
 
 def run_all_mathieson(_):
-    dataset = "ancestral_paths_new"
+    dataset = "ancestral_paths_v3"
     population = "all"
 
     # noinspection PyUnresolvedReferences
@@ -199,7 +199,7 @@ def run_all_mathieson(_):
 
 
 def run_all_locus(_):
-    dataset = config.get("dataset", "ancestral_paths_new")
+    dataset = config.get("dataset", "ancestral_paths_v3")
     population = config.get("population", "all")
     locus = config.get("locus", "chr17:25869029-48635050")
     batch = config.get("batch", 1)
@@ -235,8 +235,8 @@ def run_all_locus(_):
 rule all:
     # produce all the selection reports and pick peaks with manhattan harvester
     input:
-        "figs/ancestral_paths_new-all-filtered-main_figure.png",
-        "figs/ancestral_paths_new-samples_map.png",
+        "figs/ancestral_paths_v3-all-filtered-main_figure.png",
+        "figs/ancestral_paths_v3-samples_map.png",
 
 
 rule ancestries:

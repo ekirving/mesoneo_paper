@@ -18,7 +18,7 @@ quiet(library(RcppCNPy))
 source("scripts/clues_utils.R")
 
 # load the clues report
-report <- read_tsv("clues/ancestral_paths_new-all-clues_report.tsv", col_types = cols()) %>%
+report <- read_tsv("clues/ancestral_paths_v3-all-clues_report.tsv", col_types = cols()) %>%
   rename(rsid = rsid_x) %>%
   select(c("rsid", "mode", "ancestry")) %>%
   drop_na()
@@ -26,7 +26,7 @@ report <- read_tsv("clues/ancestral_paths_new-all-clues_report.tsv", col_types =
 freq <- bind_rows(
   apply(report, 1, function(row) {
     # extract the maximum posterior final frequency
-    clues_load_data("ancestral_paths_new", "all", row["rsid"], row["mode"], row["ancestry"]) %>%
+    clues_load_data("ancestral_paths_v3", "all", row["rsid"], row["mode"], row["ancestry"]) %>%
       filter(epoch == 0) %>%
       group_by(rsid, epoch) %>%
       top_n(1, density) %>%
@@ -37,4 +37,4 @@ freq <- bind_rows(
   })
 )
 
-write_tsv(freq, "clues/ancestral_paths_new-all-clues_report-freq_final.tsv")
+write_tsv(freq, "clues/ancestral_paths_v3-all-clues_report-freq_final.tsv")

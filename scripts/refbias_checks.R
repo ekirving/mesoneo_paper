@@ -15,13 +15,13 @@ quiet(library(ggplot2))
 quiet(library(ggrepel))
 
 # load the CLUES reports
-data.with_mod <- read_tsv("clues/ancestral_paths_new-all-clues_report.tsv", col_types = cols()) %>%
+data.with_mod <- read_tsv("clues/ancestral_paths_v3-all-clues_report.tsv", col_types = cols()) %>%
   filter(mode == "ancient") %>%
   select(c("rsid", "chrom", "start", "ancestry", "logLR", "s", "p.value", "info")) %>%
   mutate(log10p = -log10(p.value)) %>%
   mutate(vesion = "with_mod")
 
-data.no_mod <- read_tsv("clues.no_mod/ancestral_paths_new-all-clues_report.tsv", col_types = cols()) %>%
+data.no_mod <- read_tsv("clues.no_mod/ancestral_paths_v3-all-clues_report.tsv", col_types = cols()) %>%
   filter(mode == "ancient") %>%
   rename(rsid = rsid_x) %>%
   select(c("rsid", "chrom", "start", "ancestry", "logLR", "s", "p.value", "info")) %>%
@@ -92,8 +92,8 @@ ggsave("refbias/02-refbias-log10p-scatter.png", width = 16, height = 9)
 # ------------------------------------------------------------------------------------------
 
 # load the posterior frequencies of both sets of CLUES models (with modern genotype frequencies vs. without)
-post.with_mod <- read_tsv("clues/ancestral_paths_new-all-clues_report-freq_final.tsv", col_types = cols())
-post.no_mod <- read_tsv("clues.no_mod/ancestral_paths_new-all-clues_report-freq_final.tsv", col_types = cols())
+post.with_mod <- read_tsv("clues/ancestral_paths_v3-all-clues_report-freq_final.tsv", col_types = cols())
+post.no_mod <- read_tsv("clues.no_mod/ancestral_paths_v3-all-clues_report-freq_final.tsv", col_types = cols())
 
 data.both <- data.with_mod %>%
   inner_join(data.no_mod, by = c("rsid", "ancestry"), suffix = c("_with_mod", "_no_mod")) %>%

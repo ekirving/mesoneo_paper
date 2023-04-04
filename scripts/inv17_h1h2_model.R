@@ -16,7 +16,7 @@ quiet(library(tidyr))
 inv_calls <- read_delim("data/andres/inversion.calls.andres.txt", " ")
 
 # load the sample metadata
-meta <- read_tsv("data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv")
+meta <- read_tsv("data/ancestral_paths_v3/ancestral_paths_merged_filtered_age.sampleInfo.tsv")
 
 # convert the inversion calls into CLUES input format
 inv_calls %>%

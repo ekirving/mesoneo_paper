@@ -15,15 +15,15 @@ quiet(library(gtools))
 
 # # get the command line arguments
 p <- arg_parser("Plot the main text CLUES figure")
-p <- add_argument(p, "--data", help = "CLUES report", default = "clues/ancestral_paths_new-all-filtered-clues_report.tsv")
-p <- add_argument(p, "--pairs", help = "GWAS and neutral SNP pairings", default = "variants/ancestral_paths_new-all-pairs.tsv")
+p <- add_argument(p, "--data", help = "CLUES report", default = "clues/ancestral_paths_v3-all-filtered-clues_report.tsv")
+p <- add_argument(p, "--pairs", help = "GWAS and neutral SNP pairings", default = "variants/ancestral_paths_v3-all-pairs.tsv")
 p <- add_argument(p, "--unmapped", help = "List of modern SNPs unmappable by Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_unmapped.tsv.gz")
 p <- add_argument(p, "--flipped", help = "List of modern SNPs flipped by Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_flipped.tsv.gz")
-p <- add_argument(p, "--peaks-all", help = "Manhattan Harvester peaks from the pan-ancestry analysis", default = "clues/ancestral_paths_new-all-ancient-ALL-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-whg", help = "Manhattan Harvester peaks from the WHG ancestry analysis", default = "clues/ancestral_paths_new-all-ancient-WHG-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-ehg", help = "Manhattan Harvester peaks from the EHG ancestry analysis", default = "clues/ancestral_paths_new-all-ancient-EHG-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-chg", help = "Manhattan Harvester peaks from the CHG ancestry analysis", default = "clues/ancestral_paths_new-all-ancient-CHG-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-ana", help = "Manhattan Harvester peaks from the ANA ancestry analysis", default = "clues/ancestral_paths_new-all-ancient-ANA-filtered-harvester.tsv")
+p <- add_argument(p, "--peaks-all", help = "Manhattan Harvester peaks from the pan-ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ALL-filtered-harvester.tsv")
+p <- add_argument(p, "--peaks-whg", help = "Manhattan Harvester peaks from the WHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-WHG-filtered-harvester.tsv")
+p <- add_argument(p, "--peaks-ehg", help = "Manhattan Harvester peaks from the EHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-EHG-filtered-harvester.tsv")
+p <- add_argument(p, "--peaks-chg", help = "Manhattan Harvester peaks from the CHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-CHG-filtered-harvester.tsv")
+p <- add_argument(p, "--peaks-ana", help = "Manhattan Harvester peaks from the ANA ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ANA-filtered-harvester.tsv")
 p <- add_argument(p, "--mathieson", help = "Manhattan Harvester peaks from Mathieson et al. 2015", default = "mathieson/mathieson-harvester.tsv")
 p <- add_argument(p, "--output", help = "Output file", default = "figs/extended/locus")
 
@@ -179,7 +179,7 @@ lapply(focal_regions, function(focal_region) {
       arrange(p.value) %>%
       pull(rsid)
 
-    clues_plot("ancestral_paths_new", "all", ordered_snps, "ancient", focal_ancestry, label_colors)
+    clues_plot("ancestral_paths_v3", "all", ordered_snps, "ancient", focal_ancestry, label_colors)
   })
 
   gene <- filter(gene_names, merged_peaks == focal_region)

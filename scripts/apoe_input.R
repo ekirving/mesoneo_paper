@@ -13,7 +13,7 @@ quiet(library(dplyr))
 quiet(library(tidyr))
 
 # load the filtered sample metadata
-meta <- read_tsv("data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv", col_types = cols()) %>%
+meta <- read_tsv("data/ancestral_paths_v3/ancestral_paths_v3.sampleInfo.tsv", col_types = cols()) %>%
     mutate(gens = age / 28)
 
 # load the APOE SNPs

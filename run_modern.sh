@@ -13,7 +13,7 @@ datetime=$(date +%Y-%m-%d-%H%M)
 # make a unique log file
 logfile="nohup-${datetime}.out"
 
-dataset=${args[0]:='ancestral_paths_new'}
+dataset=${args[0]:='ancestral_paths_v3'}
 population=${args[1]:='all'}
 start=${args[2]:=1}
 stop=${args[3]:=22}

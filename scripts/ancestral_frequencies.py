@@ -20,15 +20,6 @@ sys.path.append(os.getcwd())
 
 from scripts.utils import get_samples
 
-# ancestral path codes
-PATH_ANA = "1"  # Anatolian Farmers         -> Neolithic
-PATH_CHG = "2"  # Caucasus Hunter-gatherers -> Yamnaya
-PATH_WHG = "3"  # Western Hunter-gatherers  -> Neolithic
-PATH_EHG = "4"  # Eastern Hunter-gatherers  -> Yamnaya
-PATH_EHG_WHG = "7"  # North European ancestry (WHG or EHG path) but unable to be more specific
-PATH_ANA_CHG = "8"  # West Asian ancestry (CHG or Anatolian path) but unable to be more specific
-PATH_UNKNOWN = "0"  # Unable to assign specific path (This labels 0,5,6,9 and 10)
-
 
 @click.command()
 @click.option("--vcf", "vcf_file", metavar="<file>", help="VCF file", type=click.Path(exists=True), required=True)

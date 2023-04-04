@@ -13,7 +13,7 @@ quiet(library(ggplot2))
 quiet(library(readr))
 quiet(library(tidyr))
 
-report <- read_tsv("variants/posterior_report_ancestral_paths_new-neo_likelihoods.tsv") %>%
+report <- read_tsv("variants/posterior_report_ancestral_paths_v3-neo_likelihoods.tsv") %>%
 
   # drop sites with no coverage one of the two datasets
   filter(epochs > 1) %>%

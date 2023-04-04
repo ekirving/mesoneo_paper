@@ -443,7 +443,7 @@ clues_trajectory <- function(dataset, population, rsid, mode, ancestry, ancestra
 
 clues_plot <- function(dataset, population, rsid_list, mode, ancestry, snp_colors, geom = "point", title = "", gen_time = 28, max_age = 13665, smooth = 10, ancestral = list()) {
 
-  # dataset <- "ancestral_paths_new"
+  # dataset <- "ancestral_paths_v3"
   # population <- "all"
   # rsid_list <- c("rs12722987", "rs4988235", "rs79117855")
   # mode <- "ancient"

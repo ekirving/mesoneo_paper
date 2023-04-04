@@ -24,7 +24,7 @@ quiet(library(zoo))
 # load some helper functions
 source("scripts/clues_utils.R")
 
-dataset <- "ancestral_paths_new"
+dataset <- "ancestral_paths_v3"
 population <- "all"
 mode <- "ancient"
 
@@ -34,7 +34,7 @@ ancestries <- c("ALL", "WHG", "EHG", "CHG", "ANA")
 tag_snps <- read_tsv("data/andres/inv17_h1h2_snps.txt")
 
 # now fetch the inv17_h1h2 report, so we can plot the ones that were run
-report <- read_tsv("clues/ancestral_paths_new-all-ancient-ALL-inv17_h1h2_report.tsv")
+report <- read_tsv("clues/ancestral_paths_v3-all-ancient-ALL-inv17_h1h2_report.tsv")
 
 # join the dataframes
 report <- report %>%
@@ -62,7 +62,7 @@ traj_report <- traj %>%
   inner_join(report %>% select(rsid_x, chrom, start), by = c("rsid" = "rsid_x")) %>%
   select(rsid, chrom, start, ancestry, epoch, freq, density)
 
-write_tsv(traj_report, "inv17/ancestral_paths_new-all-ancient-inv17_h1h2-trajectories.tsv")
+write_tsv(traj_report, "inv17/ancestral_paths_v3-all-ancient-inv17_h1h2-trajectories.tsv")
 
 # ------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ ggsave(filename = "inv17_h1h2_fig.png", plot = plt_inv, width = 16 * 10, heigh =
 report <- report %>%
   filter(!rsid_x %in% c("rs62058962"))
 
-clues_imput <- clues_plot("ancestral_paths_new", population, report$rsid_x, mode, "ALL", NA, geom = "line", title = "Imputed", ancestral = ancestral)
+clues_imput <- clues_plot("ancestral_paths_v3", population, report$rsid_x, mode, "ALL", NA, geom = "line", title = "Imputed", ancestral = ancestral)
 # clues_imput
 
 clues_likeli <- clues_plot("neo_likelihoods", population, report$rsid_x, mode, "ALL", NA, geom = "line", title = "Likelihood", ancestral = ancestral)
@@ -95,7 +95,7 @@ plt <- ggarrange(clues_imput, clues_likeli)
 ggsave(filename = "inv17/inv17-imputed_vs_likelihood.png", plot = plt, width = 16 * 5 / 2, heigh = 9 * 5 / 2, units = "mm", scale = 4, limitsize = FALSE)
 
 # load the EMD report
-# emd <- read_tsv("variants/posterior_report_ancestral_paths_new-neo_likelihoods.tsv") %>%
+# emd <- read_tsv("variants/posterior_report_ancestral_paths_v3-neo_likelihoods.tsv") %>%
 #
 #   # drop sites with no coverage one of the two datasets
 #   filter(epochs > 1) %>%

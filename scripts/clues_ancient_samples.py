@@ -18,23 +18,46 @@ sys.path.append(os.getcwd())
 
 from scripts.utils import get_samples
 
-# ancestral path codes used in the VCF
-PATH_ANA = "1"  # Anatolian Farmers         -> Neolithic
-PATH_CHG = "2"  # Caucasus Hunter-gatherers -> Yamnaya
-PATH_WHG = "3"  # Western Hunter-gatherers  -> Neolithic
-PATH_EHG = "4"  # Eastern Hunter-gatherers  -> Yamnaya
-PATH_EHG_WHG = "5"  # North European ancestry (WHG or EHG path) but unable to be more specific
-PATH_ANA_CHG = "6"  # West Asian ancestry (CHG or Anatolian path) but unable to be more specific
-PATH_UNKNOWN = "0"  # Unable to assign specific path (This labels 0,5,6,9 and 10)
 
-# map 3-letter codes to ancestral path codes
-ANCESTRY_MAP = {
-    "ALL": None,
-    "ANA": [PATH_ANA, PATH_ANA_CHG],
-    "CHG": [PATH_CHG, PATH_ANA_CHG],
-    "WHG": [PATH_WHG, PATH_EHG_WHG],
-    "EHG": [PATH_EHG, PATH_EHG_WHG],
-}
+def get_ancestry_map(dataset):
+    """
+    Handle the difference in ancestry codes between `ancestral_paths_new` and `ancestral_paths_v3`
+    """
+    PATH_ANA = "1"  # Anatolian Farmers -> Neolithic
+    PATH_CHG = "2"  # Caucasus Hunter-gatherers -> Yamnaya
+    PATH_WHG = "3"  # Western Hunter-gatherers -> Neolithic
+    PATH_EHG = "4"  # Eastern Hunter-gatherers -> Yamnaya
+
+    ancestry_map = dict()
+
+    if dataset == "ancestral_paths_new":
+
+        PATH_EHG_WHG = "5"  # North European ancestry (WHG or EHG path) but unable to be more specific
+        PATH_ANA_CHG = "6"  # West Asian ancestry (CHG or Anatolian path) but unable to be more specific
+        PATH_UNKNOWN = "0"  # Unable to assign specific path (This labels 0,5,6,9 and 10)
+
+        ancestry_map = {
+            "ALL": None,
+            "ANA": [PATH_ANA, PATH_ANA_CHG],
+            "CHG": [PATH_CHG, PATH_ANA_CHG],
+            "WHG": [PATH_WHG, PATH_EHG_WHG],
+            "EHG": [PATH_EHG, PATH_EHG_WHG],
+        }
+    elif dataset == "ancestral_paths_v3":
+
+        PATH_ANA_BAA = "5"  # Anatolian Farmer -> Bronze Age Anatolian
+        PATH_CHG_BAA = "6"  # Caucasus Hunter-gatherers -> Bronze Age Anatolian
+
+        # NB we don't use paths 5 and 6 as they lead to BAA
+        ancestry_map = {
+            "ALL": None,
+            "ANA": [PATH_ANA],
+            "CHG": [PATH_CHG],
+            "WHG": [PATH_WHG],
+            "EHG": [PATH_EHG],
+        }
+
+    return ancestry_map
 
 SEXES = ["XX", "XY", "any"]
 
@@ -52,7 +75,7 @@ MIN_ANCIENT_SAMPLES = 2
 @click.option("--ancestral", metavar="<chr>", help="The ancestral allele", type=click.Choice(BASES_N), required=True)
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
 @click.option("--population", metavar="<string>", help="Name of the population", required=True)
-@click.option("--ancestry", metavar="<string>", help="Ancestry code", type=click.Choice(ANCESTRY_MAP), required=True)
+@click.option("--ancestry", metavar="<string>", help="Ancestry code", type=click.Choice(["ALL", "ANA", "CHG", "WHG", "EHG"]), required=True)
 @click.option("--sex", metavar="<string>", help="Sample sex", type=click.Choice(SEXES), required=True)
 @click.option("--gen-time", metavar="<int>", help="Years per generation", type=int, required=True)
 @click.option("--mod-freq", metavar="<file>", type=click.File("w"), help="Modern frequency filename", required=True)
@@ -73,6 +96,7 @@ def clues_ancient_samples(
     ancients = samples[samples["age"] != 0]
     ancients = ancients[ancients["age"].notnull()]
     ancients = ancients.sort_values("age")
+    ancestry_map = get_ancestry_map(dataset)
 
     # also get all the modern samples
     moderns = samples[samples["age"] == 0]
@@ -156,7 +180,7 @@ def clues_ancient_samples(
 
             # treat each call as pseudo-haploid
             for geno, path in zip(gt, rec.samples[sample].get("AP", "")[0].split("|")):
-                if path in ANCESTRY_MAP[ancestry]:
+                if path in ancestry_map[ancestry]:
                     if gt == (1, 1):
                         gp_haploid = (gp_diploid[0] + (gp_diploid[1] / 2), gp_diploid[2])
                     elif gt == (0, 0):
@@ -207,7 +231,7 @@ def clues_ancient_samples(
 
             # filter for genotypes belonging to this ancestry
             for call, path in zip(rec.samples[sample].alleles, rec.samples[sample].get("AP", "")[0].split("|")):
-                if path in ANCESTRY_MAP[ancestry]:
+                if path in ancestry_map[ancestry]:
                     # count the ancestry specific genotypes
                     calls.append(call)
 

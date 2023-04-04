@@ -15,7 +15,7 @@ quiet(library(tidyr))
 
 # get the command line arguments
 p <- arg_parser("Filter the CLUES report based on Fj scores")
-p <- add_argument(p, "--data", help = "CLUES report", default = "clues/ancestral_paths_new-all-clues_report.tsv")
+p <- add_argument(p, "--data", help = "CLUES report", default = "clues/ancestral_paths_v3-all-clues_report.tsv")
 p <- add_argument(p, "--gwas", help = "Fj scores for the GWAS SNPs", default = "refbias/Evan_GWAS_Anc_1000g.txt.gz")
 p <- add_argument(p, "--neut", help = "Fj scores for the neutral SNPs", default = "refbias/Evan_NEUTRAL_Anc_1000g.txt.gz")
 p <- add_argument(p, "--post", help = "Posterior frequency differences", default = "refbias/posterior-diff.tsv.gz")

@@ -23,7 +23,7 @@ quiet(library(ggpubr))
 
 # get the command line arguments
 p <- arg_parser("Plot the map of sampling locations")
-p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv")
+p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/ancestral_paths_v3/ancestral_paths_merged_filtered_age.sampleInfo.tsv")
 p <- add_argument(p, "--output", help = "PNG file to output", default = "map_samples.png")
 
 argv <- parse_args(p)

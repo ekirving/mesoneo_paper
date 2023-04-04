@@ -56,11 +56,11 @@ snp_colors <- c(
 
 # fetch the inv17_h1h2 reports
 region_data <- bind_rows(
-  read_tsv("clues/ancestral_paths_new-all-ancient-ALL-inv17_h1h2_report.tsv"),
-  read_tsv("clues/ancestral_paths_new-all-ancient-ANA-inv17_h1h2_report.tsv"),
-  read_tsv("clues/ancestral_paths_new-all-ancient-CHG-inv17_h1h2_report.tsv"),
-  read_tsv("clues/ancestral_paths_new-all-ancient-EHG-inv17_h1h2_report.tsv"),
-  read_tsv("clues/ancestral_paths_new-all-ancient-WHG-inv17_h1h2_report.tsv"),
+  read_tsv("clues/ancestral_paths_v3-all-ancient-ALL-inv17_h1h2_report.tsv"),
+  read_tsv("clues/ancestral_paths_v3-all-ancient-ANA-inv17_h1h2_report.tsv"),
+  read_tsv("clues/ancestral_paths_v3-all-ancient-CHG-inv17_h1h2_report.tsv"),
+  read_tsv("clues/ancestral_paths_v3-all-ancient-EHG-inv17_h1h2_report.tsv"),
+  read_tsv("clues/ancestral_paths_v3-all-ancient-WHG-inv17_h1h2_report.tsv"),
 )
 
 # fix `rsid` colname issue
@@ -112,7 +112,7 @@ plt_col_clues <- lapply(ancestries, function(focal_ancestry) {
     arrange(p.value) %>%
     pull(rsid)
 
-  clues_plot("ancestral_paths_new", "all", ordered_snps, "ancient", focal_ancestry, label_colors, ancestral = ancestral)
+  clues_plot("ancestral_paths_v3", "all", ordered_snps, "ancient", focal_ancestry, label_colors, ancestral = ancestral)
 })
 
 plt_region <- ggarrange(

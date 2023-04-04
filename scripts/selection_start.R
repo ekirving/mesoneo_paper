@@ -61,7 +61,7 @@ sweep <- read_tsv("lct-sweep/lct-sweep-snps-report.tsv", guess_max = 1500, col_t
 # find the earliest epoch in which the frequency is above 10% with >0.5 density
 models <- list()
 for (i in 1:nrow(sweep)) {
-    prefix <- paste0("clues/ancestral_paths_new/all/", sweep[i, ]$rsid, "/ancestral_paths_new-all-", sweep[i, ]$rsid, "-ancient-ALL-any")
+    prefix <- paste0("clues/ancestral_paths_v3/all/", sweep[i, ]$rsid, "/ancestral_paths_v3-all-", sweep[i, ]$rsid, "-ancient-ALL-any")
 
     # load the CLUES model, and extract the maximum likelihood path
     model <- clues_trajectory(prefix) %>%

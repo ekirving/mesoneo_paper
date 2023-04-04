@@ -18,8 +18,8 @@ quiet(library(Hmisc))
 
 # get the command line arguments
 p <- arg_parser("Plot the binned allele frequencies for a SNP")
-p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/Ancestral_paths_new/ancestral_paths_merged_filtered.sampleInfo.tsv")
-p <- add_argument(p, "--imputed", help = "Imputed genotypes", default = "binned/ancestral_paths_new-lct-genotypes.tsv")
+p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/ancestral_paths_v3/ancestral_paths_merged_filtered.sampleInfo.tsv")
+p <- add_argument(p, "--imputed", help = "Imputed genotypes", default = "binned/ancestral_paths_v3-lct-genotypes.tsv")
 p <- add_argument(p, "--likelihoods", help = "Genotype likelihoods", default = "binned/neo_likelihoods-lct-genotypes.tsv")
 p <- add_argument(p, "--output", help = "PNG file to output", default = "binned/lct-binned-calls-shotgun.png")
 

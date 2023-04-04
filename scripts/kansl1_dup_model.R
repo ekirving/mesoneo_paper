@@ -29,7 +29,7 @@ inv_calls <- read_delim("data/andres/inversion.calls.andres.txt", " ", col_types
 kansl1_calls <- read_tsv("clues/inv_dup_anc/rs80028338-calls.tsv", col_types = cols())
 
 # load the filtered sample metadata
-meta <- read_tsv("data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv", col_types = cols())
+meta <- read_tsv("data/ancestral_paths_v3/ancestral_paths_merged_filtered_age.sampleInfo.tsv", col_types = cols())
 
 inv_dup_calls <- dup_calls %>%
 

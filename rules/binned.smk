@@ -40,8 +40,8 @@ rule plot_binned_freqs_shotgun:
     Plot the binned frequencies for a locus from the shotgun dataset
     """
     input:
-        tsv=config["samples"]["ancestral_paths_new"]["metadata"],
-        imp="binned/ancestral_paths_new-{locus}-genotypes.tsv",
+        tsv=config["samples"]["ancestral_paths_v3"]["metadata"],
+        imp="binned/ancestral_paths_v3-{locus}-genotypes.tsv",
         lik="binned/neo_likelihoods-{locus}-genotypes.tsv",
     output:
         png="binned/{locus}-binned-calls-shotgun.png",

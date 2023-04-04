@@ -43,7 +43,7 @@ rule simulated_modern_freqs:
 
 checkpoint simulated_pair_snps:
     input:
-        gwas="variants/ancestral_paths_new-all-gwas.tsv",
+        gwas="variants/ancestral_paths_v3-all-gwas.tsv",
         neut="variants/chr3_true_paths-all-modern_freqs.tsv",
         anc="1000G/1000G_chrAll_ancestral.tsv.gz",
     output:

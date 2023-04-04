@@ -159,7 +159,7 @@ def clues_inference_both_inputs(wildcards):
 
     return {
         "anc": expand("clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ALL-any.ancient", **params),
-        "freq": expand("clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ALL-any.freq", **params),
+        "freq": ancient(expand("clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ALL-any.freq", **params)),
         "bins": expand("clues/{dataset}-{population}-time.bins", **params),
         "coal": expand("relate/{panel}-{pops}-popsize.coal", **params),
         "timeb": expand("relate/{panel}/{pops}/{rsid}/{panel}-{pops}-popsize-allsnps-{rsid}.timeb", **params),
