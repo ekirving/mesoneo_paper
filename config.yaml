@@ -10,6 +10,15 @@ samples:
     populations:
       all: {}
 
+  simulated_relate_painted:
+    reference: GRCh37
+    metadata: data/ancestral_paths_v3/simulated_relate_painted.sampleInfo.tsv
+    genotypes: data/ancestral_paths_v3/simulated_relate_painted.vcf.gz
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
 #  ancestral_paths_new:
 #    reference: GRCh37
 #    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv

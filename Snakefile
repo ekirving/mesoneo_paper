@@ -56,11 +56,11 @@ wildcard_constraints:
 
 
 def get_paired_snps(dataset, population, snp_type, chrom=None):
-    simulated = ["chr3_true_paths", "chr3_inferred_paths"]
+    simulated = ["chr3_true_paths", "chr3_inferred_paths", "simulated_relate_painted"]
 
     if dataset in simulated:
         # noinspection PyUnresolvedReferences
-        pairs = checkpoints.simulated_pair_snps.get()
+        pairs = checkpoints.simulated_pair_snps.get(dataset=dataset, population=population)
     else:
         # noinspection PyUnresolvedReferences
         pairs = checkpoints.neutral_pair_snps.get(dataset=dataset, population=population)
@@ -79,9 +79,10 @@ def run_all_ancestries(_):
     population = config.get("population", "all")
     ancestry = config.get("ancestry", "ALL")
     snp_type = config.get("type", "gwas")
+    chrom = config.get("chr", None)
 
     # get all the SNPs
-    rsid = get_paired_snps(dataset, population, snp_type, config.get("chr", None))
+    rsid = get_paired_snps(dataset, population, snp_type, chrom)
 
     return expand(
         "clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ancient-{ancestry}-any.png",
