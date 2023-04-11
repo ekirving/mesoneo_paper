@@ -44,7 +44,7 @@ rule plot_binned_freqs_shotgun:
         imp="binned/ancestral_paths_v3-{locus}-genotypes.tsv",
         lik="binned/neo_likelihoods-{locus}-genotypes.tsv",
     output:
-        png="binned/{locus}-binned-calls-shotgun.png",
+        png="figs/{locus}-binned-calls-shotgun.png",
     shell:
         "Rscript scripts/binned_frequencies_shotgun.R"
         " --samples {input.tsv}"
@@ -136,7 +136,7 @@ rule plot_binned_freqs_1240k:
         tsv="data/1240k/Le_et_al_2022_Table_S1.txt",
         geno="binned/1240k-{locus}.tsv",
     output:
-        png="binned/{locus}-binned-calls-1240k.png",
+        png="figs/{locus}-binned-calls-1240k.png",
     shell:
         "Rscript scripts/binned_frequencies_1240k.R"
         " --samples {input.tsv}"

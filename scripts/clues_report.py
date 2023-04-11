@@ -19,7 +19,7 @@ ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 @click.command()
 @click.option("--data", "data_tsv", metavar="<file>", help="SNP data", type=click.Path(exists=True), required=True)
 @click.option("--columns", metavar="<col,col>", help="rsID columns", required=True)
-@click.option("--info", "info_tsv", metavar="<file>", help="INFO scores", type=click.Path(exists=True), required=True)
+@click.option("--info", "info_tsv", metavar="<file>", help="INFO scores", type=click.Path(exists=True))
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
 @click.option("--population", metavar="<string>", help="Name of the population", required=True)
 @click.option("--mode", metavar="<string>", help="Clues mode", required=True)
@@ -31,7 +31,6 @@ def clues_report(data_tsv, columns, info_tsv, dataset, population, mode, ancestr
     """
     # get the list of SNPs to load
     data = pd.read_table(data_tsv)
-    info = pd.read_table(info_tsv)
 
     snps = set()
     for col in columns.split(","):
@@ -86,13 +85,17 @@ def clues_report(data_tsv, columns, info_tsv, dataset, population, mode, ancestr
     # https://en.wikipedia.org/wiki/Wilks%27_theorem
     df["p.value"] = df["logLR"].apply(lambda logLR: chi2.sf(2 * logLR, 1))
 
-    # avoid duplicate column
-    info.drop("rsid", axis=1)
+    if info_tsv:
+        info = pd.read_table(info_tsv)
+        # avoid duplicate column
+        info = info.drop("rsid", axis=1)
 
-    # merge the INFO scores
-    merge = pd.merge(df, info, how="left", on=["chrom", "start"])
-    merge = merge.sort_values(by=["chrom", "start"])
-    merge.to_csv(output, sep="\t", index=False)
+        # merge the INFO scores
+        merge = pd.merge(df, info, how="left", on=["chrom", "start"])
+        merge = merge.sort_values(by=["chrom", "start"])
+        merge.to_csv(output, sep="\t", index=False)
+    else:
+        df.to_csv(output, sep="\t", index=False)
 
     print("INFO: Finished!", file=sys.stderr)
 

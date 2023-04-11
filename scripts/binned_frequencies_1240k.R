@@ -89,7 +89,7 @@ ggplot(binned, aes(x=bin, y=daf, color=rsid, weight=count)) +
     geom_point(aes(size=count), alpha=.8, position=position_dodge(width = 100)) +
     geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width=200, position=position_dodge(width = 100)) +
 
-    guides(size=guide_legend(title="Genotype count")) +
+    guides(size=guide_legend(title="Haploid count")) +
 
     scale_x_continuous(breaks = xbreaks, labels = xlabels) +
     scale_size_continuous(limits  = c(size_min, size_max), breaks = size_breaks) +

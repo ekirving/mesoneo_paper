@@ -43,7 +43,7 @@ Using a Bonferroni corrected significance threshold of `r formatC(p.bonferroni, 
 * `r nrow(filter(snps_bonferroni, type=='Control'))` significant SNPs in the Control group (n=`r num_control`)
 
 ```{r fig2, fig.width = 12, fig.height = 6.75}
-manhattan_plot(peaks$data, c("type"), p.genomewide, p.bonferroni, colors = ancestry_colors, size_snps=FALSE, wrap=TRUE)
+manhattan_plot(peaks$data, c("type"), p.genomewide, colors = ancestry_colors, size_snps=FALSE, wrap=TRUE)
 ```
 
 **Figure XX.** Manhattan plot of the p-values from running CLUES on an aDNA time series from all West Eurasian samples in the imputed dataset, for (a) GWAS SNPs from the GWAS Catalog; and (b) Control SNPs, frequency paired with the GWAS SNPs.

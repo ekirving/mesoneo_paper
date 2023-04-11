@@ -19,41 +19,41 @@ samples:
     populations:
       all: {}
 
-#  ancestral_paths_new:
-#    reference: GRCh37
-#    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
-#    genotypes: data/Ancestral_paths_new/ancestral_paths_merged_filtered.bcf
-#    is_haploid: False
-#    is_likelihood: False
-#    populations:
-#      all: {}
-#
-#  chr3_true_paths:
-#    reference: GRCh37
-#    metadata: data/Ancestral_paths_new/simulation_metadata.tsv
-#    genotypes: data/Ancestral_paths_new/chr3_simulated_true_painted.vcf.gz
-#    is_haploid: False
-#    is_likelihood: False
-#    populations:
-#      all: {}
-#
-#  chr3_inferred_paths:
-#    reference: GRCh37
-#    metadata: data/Ancestral_paths_new/simulation_metadata.tsv
-#    genotypes: data/Ancestral_paths_new/chr3_simulated_inferred_painted.vcf.gz
-#    is_haploid: False
-#    is_likelihood: False
-#    populations:
-#      all: {}
-#
-#  imputed_unfiltered:
-#    reference: GRCh37
-#    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
-#    genotypes: unfiltered/ancestral_paths_new-all-chrALL-unfiltered-1000G.bcf
-#    is_haploid: False
-#    is_likelihood: False
-#    populations:
-#      all: {}
+  ancestral_paths_new:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
+    genotypes: data/Ancestral_paths_new/ancestral_paths_merged_filtered.bcf
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  chr3_true_paths:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/simulation_metadata.tsv
+    genotypes: data/Ancestral_paths_new/chr3_simulated_true_painted.vcf.gz
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  chr3_inferred_paths:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/simulation_metadata.tsv
+    genotypes: data/Ancestral_paths_new/chr3_simulated_inferred_painted.vcf.gz
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
+
+  imputed_unfiltered:
+    reference: GRCh37
+    metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
+    genotypes: unfiltered/ancestral_paths_new-all-chrALL-unfiltered-1000G.bcf
+    is_haploid: False
+    is_likelihood: False
+    populations:
+      all: {}
 
   neo_likelihoods:
     reference: GRCh37

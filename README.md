@@ -2,7 +2,7 @@
 This repository contains code for the ancestry stratified selection analyses from 
 [The Selection Landscape and Genetic Legacy of Ancient Eurasians](https://).
 
-![Figure 2](./figure/Figure_2.png?raw=true)
+![Figure 4](./figure/Figure_4.png?raw=true)
 
 If you reuse any of this code then please cite the preprint:
 > Irving-Pease, E.K.&ast;, Refoyo-Martínez, A.&ast;, Ingason, A.&ast;, Pearson, A.&ast;, Fischer, A.&ast;, Barrie, 

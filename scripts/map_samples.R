@@ -23,7 +23,7 @@ quiet(library(ggpubr))
 
 # get the command line arguments
 p <- arg_parser("Plot the map of sampling locations")
-p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/ancestral_paths_v3/ancestral_paths_merged_filtered_age.sampleInfo.tsv")
+p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/ancestral_paths_v3/ancestral_paths_v3.sampleInfo.tsv")
 p <- add_argument(p, "--output", help = "PNG file to output", default = "map_samples.png")
 
 argv <- parse_args(p)
@@ -42,7 +42,9 @@ samples <- read_tsv(argv$samples, col_types = cols(), guess_max=5000) %>%
     # convert to factors so we can set the display order
     mutate(region = factor(region, levels=region_levels, labels=region_labels)) %>%
     # only keep the necessary columns
-    select(sampleId, popId, region, ageAverage, latitude, longitude)
+    select(sampleId, popId, region, ageAverage, latitude, longitude) %>%
+    # sort by age so the oldest are printed on top
+    arrange(ageAverage)
 
 # convert to an `sf` object
 samples_sf <- st_as_sf(samples, coords=c('longitude', 'latitude'), crs=4326)
@@ -55,8 +57,7 @@ plt_map <- ggplot() +
     # use a world map
     geom_sf(data = world) +
     # display the samples/ages
-    # geom_sf(data = samples_sf, mapping = aes(color=ageAverage))
-    geom_sf(data = samples_sf, mapping = aes(color=ageAverage), position=position_dodge()) +
+    geom_sf(data = samples_sf, mapping = aes(color=ageAverage), position="dodge") +
     # crop the map to only show West Eurasia
     coord_sf(xlim = c(-25, 77), ylim = c(33, 71.5), expand = FALSE) +
     scale_color_viridis_c(limits = c(0, 15000), option="magma") +

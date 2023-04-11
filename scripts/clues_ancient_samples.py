@@ -30,7 +30,7 @@ def get_ancestry_map(dataset):
 
     ancestry_map = dict()
 
-    if dataset == "ancestral_paths_new":
+    if dataset in ["ancestral_paths_new", "chr3_true_paths", "chr3_inferred_paths"]:
 
         PATH_EHG_WHG = "5"  # North European ancestry (WHG or EHG path) but unable to be more specific
         PATH_ANA_CHG = "6"  # West Asian ancestry (CHG or Anatolian path) but unable to be more specific
@@ -43,7 +43,7 @@ def get_ancestry_map(dataset):
             "WHG": [PATH_WHG, PATH_EHG_WHG],
             "EHG": [PATH_EHG, PATH_EHG_WHG],
         }
-    elif dataset == "ancestral_paths_v3":
+    elif dataset in ["ancestral_paths_v3", "simulated_relate_painted"]:
 
         PATH_ANA_BAA = "5"  # Anatolian Farmer -> Bronze Age Anatolian
         PATH_CHG_BAA = "6"  # Caucasus Hunter-gatherers -> Bronze Age Anatolian
@@ -58,6 +58,7 @@ def get_ancestry_map(dataset):
         }
 
     return ancestry_map
+
 
 SEXES = ["XX", "XY", "any"]
 
@@ -75,7 +76,13 @@ MIN_ANCIENT_SAMPLES = 2
 @click.option("--ancestral", metavar="<chr>", help="The ancestral allele", type=click.Choice(BASES_N), required=True)
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
 @click.option("--population", metavar="<string>", help="Name of the population", required=True)
-@click.option("--ancestry", metavar="<string>", help="Ancestry code", type=click.Choice(["ALL", "ANA", "CHG", "WHG", "EHG"]), required=True)
+@click.option(
+    "--ancestry",
+    metavar="<string>",
+    help="Ancestry code",
+    type=click.Choice(["ALL", "ANA", "CHG", "WHG", "EHG"]),
+    required=True,
+)
 @click.option("--sex", metavar="<string>", help="Sample sex", type=click.Choice(SEXES), required=True)
 @click.option("--gen-time", metavar="<int>", help="Years per generation", type=int, required=True)
 @click.option("--mod-freq", metavar="<file>", type=click.File("w"), help="Modern frequency filename", required=True)
@@ -118,6 +125,9 @@ def clues_ancient_samples(
         raise RuntimeError(f"SNP {chrom}:{pos} not found in {vcf_file}")
 
     alleles = [rec.ref] + list(rec.alts)
+
+    if ancestral == "0":
+        ancestral = rec.ref
 
     if len(alleles) > 2:
         raise RuntimeError(f"{chrom}:{pos} {rec.id} SNP is polyallelic {alleles} in {vcf_file}")

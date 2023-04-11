@@ -33,7 +33,7 @@ include: "rules/binned.smk"
 include: "rules/map.smk"
 
 
-CLUES_MODES = ["ancient", "modern", "both"]
+CLUES_MODES = ["ancient", "modern", "both", "simulated"]
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 AGE_MODEL = ["model", "noage"]
 PATHS = ["true", "inferred"]
@@ -236,8 +236,22 @@ def run_all_locus(_):
 rule all:
     # produce all the selection reports and pick peaks with manhattan harvester
     input:
-        "figs/ancestral_paths_v3-all-filtered-main_figure.png",
+        # plot the map of sampling locations
         "figs/ancestral_paths_v3-samples_map.png",
+        # plot the main text figure
+        "figs/ancestral_paths_v3-all-filtered-main_figure.png",
+        # plot the extended data figures
+        "figs/extended/ancestral_paths_v3-all.done",
+        # plot the supplemental figures
+        "figs/supplement/ancestral_paths_v3-all-modern.png",
+        "figs/supplement/ancestral_paths_v3-all-ancient.png",
+        "figs/supplement/ancestral_paths_v3-all-ancestral-gwas.png",
+        "figs/supplement/ancestral_paths_v3-all-ancestral-control.png",
+        # plot the Manhattan plot of the simulated SNPs
+        "figs/supplement/simulated_relate_painted-all-simulated.png",
+        # plot the binned LCT SNPs
+        "figs/lct-binned-calls-shotgun.png",
+        "figs/lct-binned-calls-1240k.png",
 
 
 rule ancestries:

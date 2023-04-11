@@ -51,7 +51,7 @@ checkpoint simulated_pair_snps:
     log:
         "variants/{dataset}-{population}-pairs.log",
     wildcard_constraints:
-        dataset="|".join(["chr3_true_paths", "chr3_inferred_paths", "simulated_relate_painted"])
+        dataset="|".join(["chr3_true_paths", "chr3_inferred_paths", "simulated_relate_painted"]),
     shell:
         "python scripts/neutral_pair_snps.py"
         " --gwas {input.gwas}"
@@ -59,3 +59,6 @@ checkpoint simulated_pair_snps:
         " --ancestral {input.anc}"
         " --simulated "
         " --output {output} &> {log}"
+
+
+ruleorder: simulated_pair_snps > neutral_pair_snps

@@ -159,7 +159,9 @@ def clues_inference_both_inputs(wildcards):
 
     return {
         "anc": expand("clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ALL-any.ancient", **params),
-        "freq": ancient(expand("clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ALL-any.freq", **params)),
+        "freq": ancient(
+            expand("clues/{dataset}/{population}/{rsid}/{dataset}-{population}-{rsid}-ALL-any.freq", **params)
+        ),
         "bins": expand("clues/{dataset}-{population}-time.bins", **params),
         "coal": expand("relate/{panel}-{pops}-popsize.coal", **params),
         "timeb": expand("relate/{panel}/{pops}/{rsid}/{panel}-{pops}-popsize-allsnps-{rsid}.timeb", **params),
@@ -220,6 +222,8 @@ rule clues_plot_trajectory:
     params:
         input=lambda wildcards, input: trim_ext(input[0], 2),
         output=lambda wildcards, input, output: trim_ext(output[0]),
+    resources:
+        matplotlib=1, # running too many `matplotlib` jobs simultaneously causes them to crash
     shell:
         "python scripts/clues_plot_trajectory.py"
         " --gen-time {config[gen_time]}"
@@ -258,18 +262,42 @@ rule clues_report_mode_ancestry_filter_refbias:
         gwas="refbias/Evan_GWAS_Anc_1000g.txt.gz",
         neut="refbias/Evan_NEUTRAL_Anc_1000g.txt.gz",
         post="refbias/posterior-diff.tsv.gz",
+        pairs="variants/{dataset}-{population}-pairs.tsv",
     output:
         tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-clues_report.tsv",
+    wildcard_constraints:
+        mode="ancient|modern"
     shell:
         "Rscript scripts/filter_refbias.R"
         " --data {input.tsv}"
         " --gwas {input.gwas}"
         " --neut {input.neut}"
         " --post {input.post}"
+        " --pairs {input.pairs}"
         " --output {output.tsv}"
 
 
-rule clues_harvester_input:
+rule clues_simulation_report_mode_ancestry:
+    input:
+        pairs="variants/{dataset}-{population}-pairs.tsv",
+    output:
+        tsv="clues/{dataset}-{population}-simulated-{ancestry}-filtered-clues_report.tsv",
+    log:
+        "clues/{dataset}-{population}-simulated-{ancestry}-filtered-clues_report.tsv.log",
+    wildcard_constraints:
+        dataset="|".join(["chr3_true_paths", "chr3_inferred_paths", "simulated_relate_painted"]),
+    shell:
+        "python scripts/clues_report.py"
+        " --data {input.pairs}"
+        " --columns neutral"
+        " --dataset {wildcards.dataset}"
+        " --population {wildcards.population}"
+        " --mode ancient"
+        " --ancestry {wildcards.ancestry}"
+        " --output {output.tsv} &> {log}"
+
+
+rule clues_sweep_detection:
     input:
         tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-clues_report.tsv",
         pairs="variants/{dataset}-{population}-pairs.tsv",
@@ -280,9 +308,9 @@ rule clues_harvester_input:
             panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
         ),
     output:
-        tsv=temp("clues/{dataset}-{population}-{mode}-{ancestry}-filtered-harvester-input.tsv"),
+        tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-sweeps.tsv",
     shell:
-        "Rscript scripts/harvester_input.R"
+        "Rscript scripts/clues_sweep_detection.R"
         " --data {input.tsv}"
         " --pairs {input.pairs}"
         " --unmapped {input.unmapped}"
@@ -290,40 +318,28 @@ rule clues_harvester_input:
         " --output {output.tsv}"
 
 
-rule clues_manhattan_harvester:
+rule clues_sweep_detection_merged:
     input:
-        tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-harvester-input.tsv",
+        peaks_all="clues/{dataset}-{population}-{mode}-ALL-filtered-sweeps.tsv",
+        peaks_whg="clues/{dataset}-{population}-{mode}-WHG-filtered-sweeps.tsv",
+        peaks_ehg="clues/{dataset}-{population}-{mode}-EHG-filtered-sweeps.tsv",
+        peaks_chg="clues/{dataset}-{population}-{mode}-CHG-filtered-sweeps.tsv",
+        peaks_ana="clues/{dataset}-{population}-{mode}-ANA-filtered-sweeps.tsv",
     output:
-        tmp=temp("clues/{dataset}-{population}-{mode}-{ancestry}-filtered-harvester-output.tsv"),
-        tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-harvester.tsv",
-    log:
-        "clues/{dataset}-{population}-{mode}-{ancestry}-filtered-harvester.tsv.log",
+        tsv="clues/{dataset}-{population}-{mode}-filtered-sweeps-merged.tsv",
     shell:
-        "{config[harvester][path]}/harvester"
-        " -chrcolumn 1"
-        " -lcolumn 2"
-        " -pcolumn 3"
-        " -inlimit 0.01"
-        " -file {input}"
-        " -out {output.tmp} &> {log} && "
-        "awk -F'\\t' 'BEGIN {{OFS=FS}} NR>1 {{split($3, range, \"-\"); $3=range[1]*10\"-\"range[2]*10}} {{print $0}}'"
-        " {output.tmp} > {output.tsv}"
-
-
-rule clues_report:
-    input:
-        "clues/{dataset}-{population}-modern-ALL-clues_report.tsv",
-        expand(
-            "clues/{dataset}-{population}-ancient-{ancestry}-clues_report.tsv", ancestry=ANCESTRIES, allow_missing=True
-        ),
-    output:
-        "clues/{dataset}-{population}-clues_report.tsv",
-    shell:
-        "head -n1 {input[0]} > {output} && tail --quiet -n+2 {input} >> {output}"
+        "Rscript scripts/clues_sweep_detection_merged.R"
+        " --peaks-all {input.peaks_all}"
+        " --peaks-whg {input.peaks_whg}"
+        " --peaks-ehg {input.peaks_ehg}"
+        " --peaks-chg {input.peaks_chg}"
+        " --peaks-ana {input.peaks_ana}"
+        " --output {output.tsv}"
 
 
 rule clues_report_filter_refbias:
     input:
+        "clues/{dataset}-{population}-modern-ALL-filtered-clues_report.tsv",
         expand(
             "clues/{dataset}-{population}-ancient-{ancestry}-filtered-clues_report.tsv",
             ancestry=ANCESTRIES,
@@ -332,66 +348,116 @@ rule clues_report_filter_refbias:
     output:
         "clues/{dataset}-{population}-filtered-clues_report.tsv",
     shell:
-        "head -n1 {input[0]} > {output} && tail --quiet -n+2 {input} >> {output}"
+        "head -n1 {input[0]} > {output} && tail -q -n+2 {input} >> {output}"
 
 
-rule clues_pvalue:
+rule clues_simulation_report:
     input:
-        "clues/{dataset}-{population}-clues_report.tsv",
+        expand(
+            "clues/{dataset}-{population}-simulated-{ancestry}-filtered-clues_report.tsv",
+            ancestry=ANCESTRIES,
+            allow_missing=True,
+        ),
     output:
-        "clues/{dataset}-{population}-clues_report_pvalue.tsv",
+        "clues/{dataset}-{population}-simulated-clues_report.tsv",
+    wildcard_constraints:
+        dataset="|".join(["chr3_true_paths", "chr3_inferred_paths", "simulated_relate_painted"]),
     shell:
-        "Rscript scripts/clues_pvalue.R"
-        " --data {input}"
-        " --output {output}"
+        "head -n1 {input[0]} > {output} && tail -q -n+2 {input} >> {output}"
 
 
-rule clues_plot_manhattan:
+rule clues_report_nearest_gene:
     input:
-        data="clues/{dataset}-{population}-clues_report_pvalue.tsv",
+        tsv="clues/{dataset}-{population}-filtered-clues_report.tsv",
+        bed=lambda wildcards: "bed/{reference}-gene_names.bed".format(
+            reference=config["samples"][wildcards.dataset]["reference"]
+        ),
+    output:
+        snps=temp("clues/{dataset}-{population}-filtered-clues_report.bed"),
+        genes="clues/{dataset}-{population}-filtered-clues_report-genes.bed",
+    shell:
+        r"""awk -F'\t' 'NR>1 {{ print $3"\t"$4-1"\t"$5"\t"$1 }}' {input.tsv} | bedtools sort | uniq > {output.snps} && """
+        r"""bedtools closest -a {output.snps} -b {input.bed} > {output.genes}"""
+
+
+rule clues_plot_main_text_figure:
+    input:
+        data="clues/{dataset}-{population}-filtered-clues_report.tsv",
+        genes="clues/{dataset}-{population}-filtered-clues_report-genes.bed",
         pairs="variants/{dataset}-{population}-pairs.tsv",
-        known="data/mathieson/41586_2015_BFnature16152_MOESM270_ESM.txt",
         unmapped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_unmapped.tsv.gz".format(
             panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
         ),
         flipped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_flipped.tsv.gz".format(
             panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
         ),
+        peaks_all="clues/{dataset}-{population}-ancient-ALL-filtered-sweeps.tsv",
+        peaks_whg="clues/{dataset}-{population}-ancient-WHG-filtered-sweeps.tsv",
+        peaks_ehg="clues/{dataset}-{population}-ancient-EHG-filtered-sweeps.tsv",
+        peaks_chg="clues/{dataset}-{population}-ancient-CHG-filtered-sweeps.tsv",
+        peaks_ana="clues/{dataset}-{population}-ancient-ANA-filtered-sweeps.tsv",
+        merged="clues/{dataset}-{population}-ancient-filtered-sweeps-merged.tsv",
+        mathieson="mathieson/mathieson-sweeps.tsv",
     output:
-        pdf="clues/{dataset}-{population}-manhattan-{x}_vs_{y}.pdf",
+        png="figs/{dataset}-{population}-filtered-main_figure.png",
     shell:
-        "Rscript scripts/clues_plot_manhattan.R"
+        "Rscript scripts/clues_plot_main_text_figure.R"
         " --data {input.data}"
+        " --genes {input.genes}"
         " --pairs {input.pairs}"
-        " --known {input.known}"
         " --unmapped {input.unmapped}"
         " --flipped {input.flipped}"
-        " --output {output.pdf}"
-        " --facet-x {wildcards.x}"
-        " --facet-y {wildcards.y}"
+        " --peaks-all {input.peaks_all}"
+        " --peaks-whg {input.peaks_whg}"
+        " --peaks-ehg {input.peaks_ehg}"
+        " --peaks-chg {input.peaks_chg}"
+        " --peaks-ana {input.peaks_ana}"
+        " --merged {input.merged}"
+        " --mathieson {input.mathieson}"
+        " --output {output.png}"
 
 
-rule clues_plot_manhattan_chr3:
+rule clues_plot_extended_data_figures:
     input:
-        data="clues/chr3_{paths}_paths-{population}-clues_report_pvalue.tsv",
-        pairs="variants/chr3_simulated-pairs.tsv",
-        known="data/mathieson/41586_2015_BFnature16152_MOESM270_ESM.txt",
+        data="clues/{dataset}-{population}-filtered-clues_report.tsv",
+        genes="clues/{dataset}-{population}-filtered-clues_report-genes.bed",
+        pairs="variants/{dataset}-{population}-pairs.tsv",
+        unmapped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_unmapped.tsv.gz".format(
+            panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
+        ),
+        flipped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_flipped.tsv.gz".format(
+            panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
+        ),
+        peaks_all="clues/{dataset}-{population}-ancient-ALL-filtered-sweeps.tsv",
+        peaks_whg="clues/{dataset}-{population}-ancient-WHG-filtered-sweeps.tsv",
+        peaks_ehg="clues/{dataset}-{population}-ancient-EHG-filtered-sweeps.tsv",
+        peaks_chg="clues/{dataset}-{population}-ancient-CHG-filtered-sweeps.tsv",
+        peaks_ana="clues/{dataset}-{population}-ancient-ANA-filtered-sweeps.tsv",
+        merged="clues/{dataset}-{population}-ancient-filtered-sweeps-merged.tsv",
+        mathieson="mathieson/mathieson-sweeps.tsv",
     output:
-        pdf="clues/chr3_{paths}_paths-{population}-manhattan-{x}_vs_{y}.pdf",
+        "figs/extended/{dataset}-{population}.done",
+    params:
+        prefix="figs/extended/{dataset}-{population}-locus",
     shell:
-        "Rscript scripts/clues_plot_manhattan.R"
+        "Rscript scripts/clues_plot_extended_data_figures.R"
         " --data {input.data}"
+        " --genes {input.genes}"
         " --pairs {input.pairs}"
-        " --known {input.known}"
-        " --output {output.pdf}"
-        " --facet-x {wildcards.x}"
-        " --facet-y {wildcards.y}"
+        " --unmapped {input.unmapped}"
+        " --flipped {input.flipped}"
+        " --peaks-all {input.peaks_all}"
+        " --peaks-whg {input.peaks_whg}"
+        " --peaks-ehg {input.peaks_ehg}"
+        " --peaks-chg {input.peaks_chg}"
+        " --peaks-ana {input.peaks_ana}"
+        " --merged {input.merged}"
+        " --mathieson {input.mathieson}"
+        " --output {params.prefix} && "
+        "touch {output}"
 
 
-ruleorder: clues_plot_manhattan_chr3 > clues_plot_manhattan
-
-
-rule clues_plot_main_text_figure:
+rule clues_plot_supplemental_figures:
     input:
         data="clues/{dataset}-{population}-filtered-clues_report.tsv",
         pairs="variants/{dataset}-{population}-pairs.tsv",
@@ -401,24 +467,58 @@ rule clues_plot_main_text_figure:
         flipped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_flipped.tsv.gz".format(
             panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
         ),
-        peaks_all="clues/{dataset}-{population}-ancient-ALL-filtered-harvester.tsv",
-        peaks_whg="clues/{dataset}-{population}-ancient-WHG-filtered-harvester.tsv",
-        peaks_ehg="clues/{dataset}-{population}-ancient-EHG-filtered-harvester.tsv",
-        peaks_chg="clues/{dataset}-{population}-ancient-CHG-filtered-harvester.tsv",
-        peaks_ana="clues/{dataset}-{population}-ancient-ANA-filtered-harvester.tsv",
-        mathieson="mathieson/mathieson-harvester.tsv",
+        peaks_mod="clues/{dataset}-{population}-modern-ALL-filtered-sweeps.tsv",
+        peaks_all="clues/{dataset}-{population}-ancient-ALL-filtered-sweeps.tsv",
+        peaks_whg="clues/{dataset}-{population}-ancient-WHG-filtered-sweeps.tsv",
+        peaks_ehg="clues/{dataset}-{population}-ancient-EHG-filtered-sweeps.tsv",
+        peaks_chg="clues/{dataset}-{population}-ancient-CHG-filtered-sweeps.tsv",
+        peaks_ana="clues/{dataset}-{population}-ancient-ANA-filtered-sweeps.tsv",
+        mathieson="mathieson/mathieson-sweeps.tsv",
     output:
-        pdf="figs/{dataset}-{population}-filtered-main_figure.png",
+        "figs/supplement/{dataset}-{population}-modern.png",
+        "figs/supplement/{dataset}-{population}-ancient.png",
+        "figs/supplement/{dataset}-{population}-ancestral-gwas.png",
+        "figs/supplement/{dataset}-{population}-ancestral-control.png",
+    params:
+        prefix="figs/supplement/{dataset}-{population}",
     shell:
-        "Rscript scripts/clues_plot_main_text_figure.R"
+        "Rscript scripts/clues_plot_supplement_figures.R"
         " --data {input.data}"
         " --pairs {input.pairs}"
         " --unmapped {input.unmapped}"
         " --flipped {input.flipped}"
+        " --peaks-mod {input.peaks_mod}"
         " --peaks-all {input.peaks_all}"
         " --peaks-whg {input.peaks_whg}"
         " --peaks-ehg {input.peaks_ehg}"
         " --peaks-chg {input.peaks_chg}"
         " --peaks-ana {input.peaks_ana}"
         " --mathieson {input.mathieson}"
-        " --output {output.pdf}"
+        " --output {params.prefix}"
+
+
+rule clues_plot_simulated_figure:
+    input:
+        data="clues/{dataset}-{population}-simulated-clues_report.tsv",
+        pairs="variants/{dataset}-{population}-pairs.tsv",
+        peaks_all="clues/{dataset}-{population}-simulated-ALL-filtered-sweeps.tsv",
+        peaks_whg="clues/{dataset}-{population}-simulated-WHG-filtered-sweeps.tsv",
+        peaks_ehg="clues/{dataset}-{population}-simulated-EHG-filtered-sweeps.tsv",
+        peaks_chg="clues/{dataset}-{population}-simulated-CHG-filtered-sweeps.tsv",
+        peaks_ana="clues/{dataset}-{population}-simulated-ANA-filtered-sweeps.tsv",
+        merged="clues/{dataset}-{population}-simulated-filtered-sweeps-merged.tsv",
+    output:
+        png="figs/supplement/{dataset}-{population}-simulated.png",
+    wildcard_constraints:
+        dataset="|".join(["chr3_true_paths", "chr3_inferred_paths", "simulated_relate_painted"]),
+    shell:
+        "Rscript scripts/clues_plot_simulated_figure.R "
+        " --data {input.data}"
+        " --pairs {input.pairs}"
+        " --peaks-all {input.peaks_all}"
+        " --peaks-whg {input.peaks_whg}"
+        " --peaks-ehg {input.peaks_ehg}"
+        " --peaks-chg {input.peaks_chg}"
+        " --peaks-ana {input.peaks_ana}"
+        " --merged {input.merged}"
+        " --output {output.png}"

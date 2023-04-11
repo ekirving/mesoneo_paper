@@ -106,13 +106,13 @@ Using a Bonferroni corrected significance threshold of `r formatC(p.bonferroni, 
 * `r nrow(filter(snps_bonferroni, type=='Control'))` significant SNPs in at least one ancestry in the Control group (n=`r num_control`)
 
 ```{r fig3, fig.width = 12, fig.height = 12}
-manhattan_plot(filter(peaks_joined, type == "GWAS"), c("ancestry", "type"), p.genomewide, p.bonferroni, colors = ancestry_colors, size_snps=FALSE, wrap=TRUE)
+manhattan_plot(filter(peaks_joined, type == "GWAS"), c("ancestry", "type"), p.genomewide, colors = ancestry_colors, size_snps=FALSE, wrap=TRUE)
 ```
 
 **Figure XX.** Manhattan plot of the p-values from running CLUES on an aDNA time series conditioned on ancestry paintings from all West Eurasian samples in the imputed dataset for GWAS SNPs from the GWAS Catalog.
 
 ```{r fig4, fig.width = 12, fig.height = 12}
-manhattan_plot(filter(peaks_joined, type == "Control"), c("ancestry", "type"), p.genomewide, p.bonferroni, colors = ancestry_colors, size_snps=FALSE, wrap=1)
+manhattan_plot(filter(peaks_joined, type == "Control"), c("ancestry", "type"), p.genomewide, colors = ancestry_colors, size_snps=FALSE, wrap=1)
 ```
 
 **Figure XX.** Manhattan plot of the p-values from running CLUES on an aDNA time series conditioned on ancestry paintings from all West Eurasian samples in the imputed dataset for Control SNPs, frequency paired with the GWAS SNPs. Dark green dots represent novel selection peaks (with respect to Mathieson et al. 2015), light green are known selection peaks, and orange are previously reported peaks which are not found to be significant in this analysis.
@@ -173,10 +173,10 @@ for (row in 1:nrow(peaks_table)) {
 
 ```{r fig5, fig.width = 12, fig.height = 4.4}
 # {r fig5, fig.width = 12, fig.height = 105}
-# manhattan_plot(peaks_joined %>% drop_na(merged_peaks), c("merged_peaks", "ancestry"), p.genomewide, p.bonferroni, num_label = 3, wrap = 5)
+# manhattan_plot(peaks_joined %>% drop_na(merged_peaks), c("merged_peaks", "ancestry"), p.genomewide, num_label = 3, wrap = 5)
 
 for (focal_peak in str_sort(unique(peaks_joined$merged_peaks), numeric = TRUE, na_last = NA)) {
-  plt <- manhattan_plot(filter(peaks_joined, merged_peaks==focal_peak), c("merged_peaks", "ancestry"), p.genomewide, p.bonferroni, num_label = 3, wrap = 5)
+  plt <- manhattan_plot(filter(peaks_joined, merged_peaks==focal_peak), c("merged_peaks", "ancestry"), p.genomewide, num_label = 3, wrap = 5)
   print(plt)
 }
 ```

@@ -63,11 +63,6 @@ region_data <- bind_rows(
   read_tsv("clues/ancestral_paths_v3-all-ancient-WHG-inv17_h1h2_report.tsv"),
 )
 
-# fix `rsid` colname issue
-region_data <- region_data %>%
-  rename(rsid = rsid_x) %>%
-  select(-rsid_y)
-
 # add dummy entry for "merged_peaks"
 region_data <- region_data %>%
   mutate(merged_peaks = "chr17:inv")
@@ -94,7 +89,7 @@ max_height <- max(-log10(region_data$p.value))
 
 # make the zoomed in manhattan plots
 plt_col_zoom <- lapply(ancestries, function(focal_ancestry) {
-  manhattan_plot(filter(region_data, ancestry == focal_ancestry), c("merged_peaks", "ancestry"), p.genomewide, p.bonferroni, top_snps = region_snps, show_strip = FALSE, wrap = 1, composite = FALSE, colors = ancestry_colors, label_colors = label_colors, region_name = region_name, max_height = max_height)
+  manhattan_plot(filter(region_data, ancestry == focal_ancestry), c("merged_peaks", "ancestry"), p.genomewide, top_snps = region_snps, show_strip = FALSE, wrap = 1, composite = FALSE, colors = ancestry_colors, label_colors = label_colors, region_name = region_name, max_height = max_height)
 })
 
 # load the all the chr17 inversion tag SNPs

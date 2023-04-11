@@ -40,7 +40,7 @@ Using a Bonferroni corrected significance threshold of `r formatC(p.bonferroni, 
 * `r nrow(filter(snps_bonferroni, type=='Control'))` significant SNPs in the Control group (n=`r num_control`)
 
 ```{r fig1, fig.width = 12, fig.height = 6.75}
-manhattan_plot(peaks$data, c("type"), p.genomewide, p.bonferroni, size_snps=FALSE)
+manhattan_plot(peaks$data, c("type"), p.genomewide, size_snps=FALSE)
 ```
 
 **Figure XX.** Manhattan plot of the p-values from running CLUES on ARG containing all samples in FIN, GBR, and TSI from 1000G Phase 3, for (a) GWAS SNPs from the GWAS Catalog; and (b) Control SNPs, frequency paired with the GWAS SNPs.

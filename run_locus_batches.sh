@@ -26,6 +26,9 @@ echo "DATASET: ${dataset}-${population}" >>$logfile
 eval "$(conda shell.bash hook)"
 conda activate mesoneo
 
+MAX_ENSEMBL=15
+MAX_MATPLOTLIB=20
+
 if ! command -v free &> /dev/null; then
   # MacOS does not have the free command
   MAX_MEM=$(sysctl -a | awk '/^hw.memsize:/{print $2/(1024)^2}')
@@ -43,7 +46,7 @@ flags+="--keep-incomplete "
 flags+="--rerun-incomplete "
 flags+="--reason "
 #flags+="--restart-times 1 "
-flags+="--resources mem_mb=${MAX_MEM} "
+flags+="--resources mem_mb=${MAX_MEM} ensembl_api=${MAX_ENSEMBL} matplotlib=${MAX_MATPLOTLIB} "
 
 for batch in $(seq 1 ${batches}); do
   echo "Starting batch ${batch} for locus..." >>$logfile

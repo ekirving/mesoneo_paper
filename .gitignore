@@ -1,7 +1,9 @@
 *-commands.sh
 *.Rproj
+*.bak
 *.xlsx
 *ccr5*
+*tmp*
 .DS_Store
 .Rhistory
 .Rproj.user
@@ -30,8 +32,8 @@ data/1240k/
 data/310320recomb_map/
 data/Ancestral_paths/
 data/Ancestral_paths_new/
-data/ancestral_paths_v3/
 data/alba/
+data/ancestral_paths_v3/
 data/mathieson/
 data/merged_final/
 data/neo.impute/
@@ -54,10 +56,10 @@ ms/
 refbias/
 relate/
 rmarkdown/*.html
+rs*-report.tsv
 rsconnect/
 segdups/
 selection/
-tmp*
 tsinfer/
 ukbb/
 unfiltered/

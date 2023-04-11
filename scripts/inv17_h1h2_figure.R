@@ -38,10 +38,10 @@ report <- read_tsv("clues/ancestral_paths_v3-all-ancient-ALL-inv17_h1h2_report.t
 
 # join the dataframes
 report <- report %>%
-  left_join(tag_snps, by = c("rsid_x" = "SNP"))
+  left_join(tag_snps, by = c("rsid" = "SNP"))
 
 # use the H1 allele to repolarize the trajectories
-ancestral <- setNames(report$H1, as.character(report$rsid_x))
+ancestral <- setNames(report$H1, as.character(report$rsid))
 
 # ------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ ancestral <- setNames(report$H1, as.character(report$rsid_x))
 # load all the trajectories
 traj <- bind_rows(
   lapply(ancestries, function(ancestry) {
-    lapply(report$rsid_x, function(rsid) {
+    lapply(report$rsid, function(rsid) {
       clues_trajectory(dataset, population, rsid, mode, ancestry, smooth = 0, ancestral = ancestral[[rsid]]) %>% mutate(ancestry = ancestry)
     })
   })
@@ -59,7 +59,7 @@ traj <- bind_rows(
 
 # add the position back on
 traj_report <- traj %>%
-  inner_join(report %>% select(rsid_x, chrom, start), by = c("rsid" = "rsid_x")) %>%
+  inner_join(report %>% select(rsid, chrom, start), by = "rsid") %>%
   select(rsid, chrom, start, ancestry, epoch, freq, density)
 
 write_tsv(traj_report, "inv17/ancestral_paths_v3-all-ancient-inv17_h1h2-trajectories.tsv")
@@ -70,7 +70,7 @@ write_tsv(traj_report, "inv17/ancestral_paths_v3-all-ancient-inv17_h1h2-trajecto
 
 # make the per-ancesty CLUES plots
 plt_clues <- lapply(ancestries, function(focal_ancestry) {
-  clues_plot(dataset, population, report$rsid_x, mode, focal_ancestry, NA, geom = "line", title = focal_ancestry, ancestral = ancestral)
+  clues_plot(dataset, population, report$rsid, mode, focal_ancestry, NA, geom = "line", title = focal_ancestry, ancestral = ancestral)
 })
 
 plt_inv <- ggarrange(plotlist = plt_clues, nrow = 1)
@@ -83,12 +83,12 @@ ggsave(filename = "inv17_h1h2_fig.png", plot = plt_inv, width = 16 * 10, heigh =
 
 # remove 1 problem SNP
 report <- report %>%
-  filter(!rsid_x %in% c("rs62058962"))
+  filter(!rsid %in% c("rs62058962"))
 
-clues_imput <- clues_plot("ancestral_paths_v3", population, report$rsid_x, mode, "ALL", NA, geom = "line", title = "Imputed", ancestral = ancestral)
+clues_imput <- clues_plot("ancestral_paths_v3", population, report$rsid, mode, "ALL", NA, geom = "line", title = "Imputed", ancestral = ancestral)
 # clues_imput
 
-clues_likeli <- clues_plot("neo_likelihoods", population, report$rsid_x, mode, "ALL", NA, geom = "line", title = "Likelihood", ancestral = ancestral)
+clues_likeli <- clues_plot("neo_likelihoods", population, report$rsid, mode, "ALL", NA, geom = "line", title = "Likelihood", ancestral = ancestral)
 # clues_likeli
 
 plt <- ggarrange(clues_imput, clues_likeli)
@@ -104,4 +104,3 @@ ggsave(filename = "inv17/inv17-imputed_vs_likelihood.png", plot = plt, width = 1
 #   mutate(emd_sqr_mean = emd_tss / epochs, js_sqr_mean = js_tss / epochs)
 #
 #
-# report$rsid_x

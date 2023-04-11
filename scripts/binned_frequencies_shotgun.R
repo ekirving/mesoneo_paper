@@ -93,7 +93,7 @@ ggplot(binned, aes(x=bin, y=daf, color=rsid, weight=count)) +
     
     facet_wrap(~type) +
 
-    guides(size=guide_legend(title="Genotype count")) +
+    guides(size=guide_legend(title="Haploid count")) +
 
     scale_x_continuous(breaks = xbreaks, labels = xlabels) +
     scale_size_continuous(limits  = c(size_min, size_max), breaks = size_breaks) +

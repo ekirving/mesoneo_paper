@@ -14,18 +14,20 @@ quiet(library(ggpubr))
 quiet(library(gtools))
 
 # # get the command line arguments
-p <- arg_parser("Plot the main text CLUES figure")
+p <- arg_parser("Plot the CLUES main text figure")
 p <- add_argument(p, "--data", help = "CLUES report", default = "clues/ancestral_paths_v3-all-filtered-clues_report.tsv")
+p <- add_argument(p, "--genes", help = "Nearest gene found in Ensembl", default = "clues/ancestral_paths_v3-all-filtered-clues_report-genes.bed")
 p <- add_argument(p, "--pairs", help = "GWAS and neutral SNP pairings", default = "variants/ancestral_paths_v3-all-pairs.tsv")
 p <- add_argument(p, "--unmapped", help = "List of modern SNPs unmappable by Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_unmapped.tsv.gz")
 p <- add_argument(p, "--flipped", help = "List of modern SNPs flipped by Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_flipped.tsv.gz")
-p <- add_argument(p, "--peaks-all", help = "Manhattan Harvester peaks from the pan-ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ALL-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-whg", help = "Manhattan Harvester peaks from the WHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-WHG-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-ehg", help = "Manhattan Harvester peaks from the EHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-EHG-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-chg", help = "Manhattan Harvester peaks from the CHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-CHG-filtered-harvester.tsv")
-p <- add_argument(p, "--peaks-ana", help = "Manhattan Harvester peaks from the ANA ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ANA-filtered-harvester.tsv")
-p <- add_argument(p, "--mathieson", help = "Manhattan Harvester peaks from Mathieson et al. 2015", default = "mathieson/mathieson-harvester.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "figs/main-fig-original.png")
+p <- add_argument(p, "--peaks-all", help = "CLUES selection peaks from the pan-ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ALL-filtered-sweeps.tsv")
+p <- add_argument(p, "--peaks-whg", help = "CLUES selection peaks from the WHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-WHG-filtered-sweeps.tsv")
+p <- add_argument(p, "--peaks-ehg", help = "CLUES selection peaks from the EHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-EHG-filtered-sweeps.tsv")
+p <- add_argument(p, "--peaks-chg", help = "CLUES selection peaks from the CHG ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-CHG-filtered-sweeps.tsv")
+p <- add_argument(p, "--peaks-ana", help = "CLUES selection peaks from the ANA ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ANA-filtered-sweeps.tsv")
+p <- add_argument(p, "--merged", help = "Merged selection peaks across ancestries", default = "clues/ancestral_paths_v3-all-ancient-filtered-sweeps-merged.tsv")
+p <- add_argument(p, "--mathieson", help = "Selection peaks from Mathieson et al. 2015", default = "mathieson/mathieson-sweeps.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "figs/ancestral_paths_v3-all-filtered-main_figure.png")
 
 argv <- parse_args(p)
 
@@ -34,40 +36,30 @@ source("scripts/clues_utils.R")
 
 ancestries <- c("ALL", "WHG", "EHG", "CHG", "ANA")
 
+# the width of the flanking region shown in the small Manhattan plots
+REGION_PADDING <- 1e6
+
+# load the nearest gene for each SNP (because the control SNPs lack gene annotations)
+ensembl_genes <- read_tsv(argv$genes, col_names = c("snp_chr", "snp_start", "snp_end", "rsid", "gene_chr", "gene_start", "gene_end", "closest_gene"), col_types = cols()) %>%
+    select(rsid, closest_gene) %>%
+    # handle multiple closest genes
+    group_by(rsid) %>%
+    summarise(closest_gene = paste0(unique(mixedsort(closest_gene)), collapse = " / "), .groups="drop")
+
 # load all the CLUES results
-clues <- load_clues(argv$data, argv$pairs, argv$unmapped, argv$flipped)
+clues <- load_clues(argv$data, argv$pairs, argv$unmapped, argv$flipped) %>%
+    left_join(ensembl_genes, by="rsid")
 
-# ----------------------------------------------------------------------------------------------------------------
+# load all the CLUES peaks
+ancient_all_peaks <- read_tsv(argv$peaks_all, col_types = cols())
+ancient_whg_peaks <- read_tsv(argv$peaks_whg, col_types = cols())
+ancient_ehg_peaks <- read_tsv(argv$peaks_ehg, col_types = cols())
+ancient_chg_peaks <- read_tsv(argv$peaks_chg, col_types = cols())
+ancient_ana_peaks <- read_tsv(argv$peaks_ana, col_types = cols())
+ancient_merged_peaks <- read_tsv(argv$merged, col_types = cols())
 
-# get the extra models for `rs1438307`
-extra_snp <- read_tsv("rs1438307-report.tsv", col_types = cols()) %>%
-    rename(rsid=rsid_x) %>%
-    select(-c(derived, minor, rsid_y))
-
-# calculate p-values from the log-likelihood ratio
-extra_snp$p.value <- pchisq(2 * extra_snp$logLR, df = 1, lower.tail = FALSE)
-
-# determine if SNPs are GWAS or controls
-extra_snp$type <- "gwas"
-
-# set facet ordering
-extra_snp$mode <- factor(extra_snp$mode, levels = c("modern", "ancient"), labels = c("Modern", "Ancient"))
-extra_snp$type <- factor(extra_snp$type, levels = c("gwas", "control"), labels = c("GWAS", "Control"))
-extra_snp$ancestry <- factor(extra_snp$ancestry, levels = c("ALL", "WHG", "EHG", "CHG", "ANA"))
-
-clues <- bind_rows(clues, extra_snp)
-
-# ----------------------------------------------------------------------------------------------------------------
-
-# Manhattan Harvester results for each of the CLUES analysis groups (i.e. modern, ancient, WHG, EHG, CHG and ANA)
-ancient_all_peaks <- suppressWarnings(read_tsv(argv$peaks_all, col_types = cols()))
-ancient_whg_peaks <- suppressWarnings(read_tsv(argv$peaks_whg, col_types = cols()))
-ancient_ehg_peaks <- suppressWarnings(read_tsv(argv$peaks_ehg, col_types = cols()))
-ancient_chg_peaks <- suppressWarnings(read_tsv(argv$peaks_chg, col_types = cols()))
-ancient_ana_peaks <- suppressWarnings(read_tsv(argv$peaks_ana, col_types = cols()))
-
-# Manhattan Harvester results for the reported p-values in Mathieson_et_al_2015
-mathieson_peaks <- suppressWarnings(read_tsv(argv$mathieson, col_types = cols()))
+# peaks for the reported p-values in Mathieson_et_al_2015
+mathieson_peaks <- read_tsv(argv$mathieson, col_types = cols())
 
 # color brewer https://colorbrewer2.org/#type=qualitative&scheme=Set2&n=5
 ancestry_colors <- c(
@@ -106,59 +98,60 @@ peaks_joined <- bind_rows(
   peaks_ana$data,
 ) %>% arrange(as.character(chrom), start)
 
-# merge all the peak regions (across all ancestries)
-all_regions <- havester_to_bed(
-  bind_rows(
-    ancient_all_peaks,
-    ancient_whg_peaks,
-    ancient_ehg_peaks,
-    ancient_chg_peaks,
-    ancient_ana_peaks,
-  ) %>%
-    # add 50kb buffer either side (for display purposes only; does not effect the reported intervals)
-    separate(col = range, into = c("start", "end"), sep = "-", convert = TRUE) %>%
-    mutate(range = paste0(start - 5e5, "-", end + 5e5))
-)
+all_regions <- tibble(
+    merged_peaks = sweep_to_bed(ancient_merged_peaks),
+    # add some buffer either side (for display purposes only; does not effect the reported intervals)
+    buffered_peaks = sweep_to_bed(ancient_merged_peaks %>% mutate(
+            start = ifelse(start > REGION_PADDING, start - REGION_PADDING, 0),
+            end = end + REGION_PADDING
+        ))
+    )
 
-# join the merged regions
-peaks_joined <- bedr.join.region(peaks_joined$bed, all_regions, verbose = FALSE) %>%
-  filter(V4 != ".") %>%
-  mutate(merged_peaks = paste0(V4, ":", as.numeric(V5) + 5e5, "-", as.numeric(V6) - 5e5)) %>%
-  select(index, merged_peaks) %>%
-  unique() %>%
-  left_join(peaks_joined, ., by = c("bed" = "index"))
+left_join_regions <- function(peaks_joined, regions, column) {
+    # join the merged regions
+    bedr.join.region(peaks_joined$bed, regions, verbose = FALSE) %>%
+        filter(V4 != ".") %>%
+        mutate(!!column := paste0(V4, ":", V5, "-", V6)) %>%
+        select(index, !!column) %>%
+        unique() %>%
+        left_join(peaks_joined, ., by = c("bed" = "index"))
+}
 
+# join the merged peaks and the buffered peaks
+peaks_joined <- left_join_regions(peaks_joined, all_regions$merged_peaks, "merged_peaks")
+peaks_joined <- left_join_regions(peaks_joined, all_regions$buffered_peaks, "buffered_peaks")
 
-# for SNPs inside GWAS selection peaks, only retain the most significant marginal ancestry
+# for SNPs inside selection peaks, only retain the most significant marginal ancestry
 ancestral_min <- peaks_joined %>%
-  mutate(merged_peaks = ifelse(type == "Control", NA, merged_peaks)) %>%
-  filter(type == "GWAS") %>%
-  filter((ancestry == "ALL" & (type == "Control" | is.na(merged_peaks))) | (ancestry != "ALL" & (type == "GWAS" & !is.na(merged_peaks)))) %>%
+  filter((ancestry == "ALL" & is.na(merged_peaks)) | (ancestry != "ALL" & !is.na(merged_peaks))) %>%
   group_by(rsid) %>%
-  slice_min(p.value, n = 1)
+  slice_min(p.value, n = 1, with_ties = FALSE)
 
 # get the gene names for each peak
 gene_names <- peaks_joined %>%
-  drop_na(merged_peaks) %>%
-  separate_rows(genes, sep = " - ") %>%
-  filter(genes != "" & genes != "NA") %>%
-  group_by(chrom, merged_peaks, genes) %>%
-  summarise(p.sum = sum(-log10(p.value)), .groups = "drop_last") %>%
-  slice_max(p.sum) %>%
-  separate(genes, c("genes", NA), sep = "[,;]", fill = "right") %>%
-  mutate(genes = ifelse(grepl("chr6:.+", merged_peaks), "HLA", genes))
+    drop_na(merged_peaks) %>%
+    group_by(merged_peaks) %>%
+    slice_min(p.value, with_ties = FALSE) %>%
+    arrange(chrom, start) %>%
+    select(chrom, merged_peaks, buffered_peaks, genes=closest_gene, p.value) %>%
+    mutate(genes = ifelse(grepl("chr6:.+", merged_peaks), "HLA", genes))
 
 # use a genome-wide significance threshold
 p.genomewide <- 5e-8
 
-# count the number of SNPs in each group
-num_gwas <- length(unique(filter(ancestral, type == "GWAS")$rsid))
-
-# calculate the Bonferroni significance threshold
-p.bonferroni <- 0.05 / num_gwas
-
 # plot the ancestry stratified selection peaks
-plt_man <- manhattan_plot(ancestral_min, c("type"), p.genomewide, p.bonferroni, show_lables = FALSE, show_legend = TRUE, show_strip = FALSE, composite = TRUE, colors = ancestry_colors, gene_names = gene_names) +
+plt_man <- manhattan_plot(
+    ancestral_min, 
+    c("mode"), 
+    p.genomewide, 
+    show_lables = FALSE, 
+    show_legend = TRUE, 
+    show_strip = FALSE, 
+    composite = TRUE, 
+    colors = ancestry_colors, 
+    gene_names = gene_names,
+    size_snps = FALSE
+  ) +
   theme(plot.title = element_text(hjust = 0.5))
 
 # plt_man
@@ -168,37 +161,36 @@ plt_man <- manhattan_plot(ancestral_min, c("type"), p.genomewide, p.bonferroni, 
 # pick three regions for the zoomed-in columns
 focal_regions <- gene_names %>%
   filter(genes %in% c("MCM6", "SLC45A2", "FADS2")) %>%
-  pull(merged_peaks) %>%
+  pull(buffered_peaks) %>%
   mixedsort()
+
+mcm6_region <- gene_names %>% filter(genes == "MCM6") %>% pull(buffered_peaks)
 
 # get the top SNP from each of the marginal ancestries
 top_marginal_snps <- peaks_joined %>%
   drop_na(merged_peaks) %>%
-  filter(p.value < p.bonferroni) %>%
-  group_by(merged_peaks, ancestry) %>%
-  slice_min(p.value, n = 1) %>%
-  group_by(merged_peaks, rsid) %>%
-  summarise(n = length(rsid), p.sum = sum(-log10(p.value))) %>%
-  arrange(merged_peaks, desc(p.sum))
+  filter(p.value < p.genomewide) %>%
+  group_by(buffered_peaks, ancestry) %>%
+  slice_min(p.value, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  select(buffered_peaks, rsid) %>%
+  unique()
 
 plt_columns <- lapply(focal_regions, function(focal_region) {
+  # focal_region <- focal_regions[[3]]
 
   # get all the SNPs in this region
-  region_data <- filter(peaks_joined, merged_peaks == focal_region) %>%
-      # remove rs12465802
-      filter(rsid != "rs12465802")
+  region_data <- peaks_joined %>% filter(buffered_peaks == focal_region)
 
   # get the list of top SNPs in the region
-  region_snps <- filter(top_marginal_snps, merged_peaks == focal_region)$rsid
+  region_snps <- top_marginal_snps %>% filter(buffered_peaks == focal_region) %>% pull(rsid)
 
-  # ----------------------------------------------------------------------------------------------------------------
-
-  if (focal_region == "chr2:135300859-137564020") {
-    # add the extra SNP
-    region_snps <- c(region_snps, "rs1438307")
+  if (focal_region == mcm6_region) {
+    # force display of the microRNA SNP
+    if (!("rs1438307" %in% region_snps)) {
+       region_snps <- c(region_snps, "rs1438307")
+    }
   }
-
-  # ----------------------------------------------------------------------------------------------------------------
 
   # pair the colours with the ordered top SNPs
   label_colors <- setNames(snp_colors[1:length(region_snps)], region_snps)
@@ -207,16 +199,31 @@ plt_columns <- lapply(focal_regions, function(focal_region) {
   region_name <- unlist(strsplit(focal_region, split = "[:-]"))
   region_name <- sprintf("%s:%.1f-%.1f Mb", region_name[1], as.integer(region_name[2]) / 1e6, as.integer(region_name[3]) / 1e6)
 
-  # determine the max height, to keep the y-axis in syc
+  # determine the max height, to keep the y-axis in sync
   max_height <- max(-log10(region_data$p.value))
 
-  # make the zoomed in manhattan plots
+  # make the zoomed in Manhattan plots
   plt_col_zoom <- lapply(ancestries, function(focal_ancestry) {
-    manhattan_plot(filter(region_data, ancestry == focal_ancestry), c("merged_peaks", "ancestry"), p.genomewide, p.bonferroni, top_snps = region_snps, show_strip = FALSE, wrap = 1, composite = FALSE, colors = ancestry_colors, label_colors = label_colors, region_name = region_name, max_height = max_height)
+    # focal_ancestry <- ancestries[[1]]
+
+    manhattan_plot(
+        filter(region_data, ancestry == focal_ancestry),
+        c("buffered_peaks", "ancestry"),
+        p.genomewide,
+        top_snps = region_snps,
+        show_strip = FALSE,
+        wrap = 1,
+        composite = FALSE,
+        colors = ancestry_colors,
+        label_colors = label_colors,
+        region_name = region_name,
+        max_height = max_height
+    )
   })
 
   # make the per-ancestry CLUES plots
   plt_col_clues <- lapply(ancestries, function(focal_ancestry) {
+    # focal_ancestry <- ancestries[[1]]
 
     # sort the SNPs by their marginal p-value
     ordered_snps <- region_data %>%
@@ -227,7 +234,7 @@ plt_columns <- lapply(focal_regions, function(focal_region) {
     clues_plot("ancestral_paths_v3", "all", ordered_snps, "ancient", focal_ancestry, label_colors)
   })
 
-  row_label <- filter(gene_names, merged_peaks == focal_region)$genes
+  row_label <- filter(gene_names, buffered_peaks == focal_region)$genes
 
   # arrange the plots into two columns
   ggarrange(

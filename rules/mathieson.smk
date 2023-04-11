@@ -11,20 +11,16 @@ from snakemake.io import expand
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 
 
-rule mathieson_manhattan_harvester:
+rule mathieson_sweep_detection:
     input:
         tsv=config["mathieson"]["targets"],
     output:
-        tsv="mathieson/mathieson-harvester.tsv",
-    log:
-        "mathieson/mathieson-harvester.tsv.log",
+        tsv="mathieson/mathieson-sweeps.tsv",
     shell:
-        "{config[harvester][path]}/harvester"
-        " -chrcolumn 2"
-        " -lcolumn 3"
-        " -pcolumn 6"
-        " -file {input.tsv}"
-        " -out {output.tsv} &> {log}"
+        "Rscript scripts/clues_sweep_detection.R"
+        " --data {input.tsv}"
+        " --1240k"
+        " --output {output.tsv}"
 
 
 checkpoint mathieson_significant:
@@ -67,4 +63,4 @@ rule mathieson_report:
     output:
         "mathieson/{dataset}-{population}-mathieson_report.tsv",
     shell:
-        "head -n1 {input[0]} > {output} && tail --quiet -n+2 {input} >> {output}"
+        "head -n1 {input[0]} > {output} && tail -q -n+2 {input} >> {output}"

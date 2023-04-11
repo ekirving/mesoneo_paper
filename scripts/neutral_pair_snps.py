@@ -15,15 +15,12 @@ import pandas as pd
 # the rounding precision to use for binning allele frequencies
 ALLELE_FREQ_PRECISION = 2
 
-# use a higher precision for pairing the simulated SNPs
-SIMULATED_FREQ_PRECISION = 3
-
 
 @click.command()
 @click.option("--gwas", "gwas_tsv", metavar="<file>", help="GWAS SNPs", type=click.Path(exists=True), required=True)
 @click.option("--neutrals", metavar="<file>", help="Neutral SNPs", type=click.Path(exists=True), required=True)
 @click.option("--ancestral", "anc_tsv", metavar="<file>", help="Ancestral", type=click.Path(exists=True), required=True)
-@click.option("--unmapped", "unm_tsv", metavar="<file>", help="Unmapped", type=click.Path(exists=True), required=True)
+@click.option("--unmapped", "unm_tsv", metavar="<file>", help="Unmapped", type=click.Path(exists=True), required=False)
 @click.option("--simulated", is_flag=True)
 @click.option("--output", metavar="<file>", type=click.Path(writable=True), help="Output filename", required=True)
 @click.option("--ratio", metavar="<int>", help="Ratio of neutral to GWAS", type=int, default=1)
@@ -31,15 +28,13 @@ def neutral_pair_snps(gwas_tsv, neutrals, anc_tsv, unm_tsv, simulated, output, r
     """
     Pair GWAS SNPs with neutral SNPs of the same modern frequency.
     """
-    precision = SIMULATED_FREQ_PRECISION if simulated else ALLELE_FREQ_PRECISION
-
     # load the GWAS SNPs
     gwas = pd.read_table(gwas_tsv)
-    gwas["AF"] = round(gwas["AC"] / gwas["AN"], precision)
+    gwas["AF"] = round(gwas["AC"] / gwas["AN"], ALLELE_FREQ_PRECISION)
 
     # load the neutral SNPs
     neut = pd.read_table(neutrals)
-    neut["AF"] = round(neut["AC"] / neut["AN"], precision)
+    neut["AF"] = round(neut["AC"] / neut["AN"], ALLELE_FREQ_PRECISION)
 
     # split SNPs with multiple rsIDs
     gwas["rsid"] = gwas["rsid"].str.split(";")
@@ -109,7 +104,7 @@ def neutral_pair_snps(gwas_tsv, neutrals, anc_tsv, unm_tsv, simulated, output, r
 
     # iterate over the AF bins and draw the same number of SNPs from neutrals
     for idx, af_bin in bins.iterrows():
-        # keep track the the unused SNPS (in case we need to borrow one)
+        # keep track of the unused SNPS (in case we need to borrow one)
         if chrom != af_bin["chr"]:
             chrom = af_bin["chr"]
             unused = []
@@ -128,7 +123,7 @@ def neutral_pair_snps(gwas_tsv, neutrals, anc_tsv, unm_tsv, simulated, output, r
                 file=sys.stderr,
             )
 
-        # back fill any missing pairs with unused SNPs from the previous bins
+        # back-fill any missing pairs with unused SNPs from the previous bins
         pair_neut += unused
         unused = pair_neut[(num_gwas * ratio) :]
 

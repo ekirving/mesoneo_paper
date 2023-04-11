@@ -30,6 +30,7 @@ eval "$(conda shell.bash hook)"
 conda activate mesoneo
 
 MAX_ENSEMBL=15
+MAX_MATPLOTLIB=20
 
 if ! command -v free &> /dev/null; then
   # MacOS does not have the free command
@@ -48,7 +49,7 @@ flags+="--keep-incomplete "
 flags+="--rerun-incomplete "
 flags+="--reason "
 #flags+="--restart-times 1 "
-flags+="--resources mem_mb=${MAX_MEM} ensembl_api=${MAX_ENSEMBL} "
+flags+="--resources mem_mb=${MAX_MEM} ensembl_api=${MAX_ENSEMBL} matplotlib=${MAX_MATPLOTLIB} "
 
 for chr in $(seq ${start} ${stop}); do
   for type in $types; do

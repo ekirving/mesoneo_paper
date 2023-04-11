@@ -23,7 +23,6 @@ data.with_mod <- read_tsv("clues/ancestral_paths_v3-all-clues_report.tsv", col_t
 
 data.no_mod <- read_tsv("clues.no_mod/ancestral_paths_v3-all-clues_report.tsv", col_types = cols()) %>%
   filter(mode == "ancient") %>%
-  rename(rsid = rsid_x) %>%
   select(c("rsid", "chrom", "start", "ancestry", "logLR", "s", "p.value", "info")) %>%
   mutate(log10p = -log10(p.value)) %>%
   mutate(vesion = "no_mod")

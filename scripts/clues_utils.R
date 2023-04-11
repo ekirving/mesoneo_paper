@@ -71,21 +71,49 @@ load_clues <- function(clues_tsv, pairs_tsv, unmapped_tsv, flipped_tsv) {
   clues
 }
 
-havester_to_bed <- function(peaks, distance = 1e6) {
+sweep_to_bed <- function(peaks, distance = 1e6) {
+    
+    # convert harvester output to BED intervals
+    bed_peaks <- peaks %>%
+        mutate(bed = paste0("chr", chrom, ":", start, "-", end)) %>%
+        pull(bed)
+    
+    # sort before merging
+    bed_peaks <- bedr.sort.region(bed_peaks, verbose = FALSE)
+    
+    # merge any regions within +/- 1 Mb of each other
+    bed_peaks <- bedr.merge.region(bed_peaks, distance = distance, verbose = FALSE)
+    
+    bed_peaks
+}
 
-  # convert havester output to BED intervals
-  bed_peaks <- peaks %>%
-    separate(col = range, into = c("start", "end"), sep = "-", convert = TRUE) %>%
-    mutate(bed = paste0("chr", chrom, ":", start - 1, "-", end)) %>%
-    pull(bed)
+annotate_peaks_by_type <- function(data, clues_peaks, mathieson_peaks) {
 
-  # sort before merging
-  bed_peaks <- bedr.sort.region(bed_peaks, verbose = FALSE)
+  # annotate the GWAS and Control peaks separately
+  annot1 <- annotate_peaks(
+      filter(data, type == "GWAS"), 
+      filter(clues_peaks, type == "gwas"),
+      mathieson_peaks
+  )
+  
+  annot2 <- annotate_peaks(
+      filter(data, type == "Control"), 
+      filter(clues_peaks, type == "control"),
+      mathieson_peaks
+  )
 
-  # merge any regions within +/- 1 Mb of each other
-  bed_peaks <- bedr.merge.region(bed_peaks, distance = distance, verbose = FALSE)
-
-  bed_peaks
+  # join the two dataframes back together
+  annot1$data <- bind_rows(
+      annot1$data,
+      annot2$data
+  )
+  
+  annot1$all <- c(annot1$all, annot2$all)
+  annot1$novel <- c(annot1$novel, annot2$novel)
+  annot1$known <- c(annot1$known, annot2$known)
+  annot1$absent <- annot1$absent[!(annot1$absent %in% annot1$all)]
+  
+  annot1
 }
 
 annotate_peaks <- function(data, clues_peaks, mathieson_peaks) {
@@ -96,10 +124,10 @@ annotate_peaks <- function(data, clues_peaks, mathieson_peaks) {
     mutate(bed = paste0("chr", chrom, ":", start - 1, "-", end))
 
   # convert to BED intervals
-  mathieson_bed <- havester_to_bed(mathieson_peaks)
+  mathieson_bed <- sweep_to_bed(mathieson_peaks)
 
   if (nrow(clues_peaks) > 0) {
-    clues_bed <- havester_to_bed(clues_peaks)
+    clues_bed <- sweep_to_bed(clues_peaks)
 
     # intersect the intervals
     novel_bed <- clues_bed[!clues_bed %in.region% mathieson_bed]
@@ -109,38 +137,73 @@ annotate_peaks <- function(data, clues_peaks, mathieson_peaks) {
     matches <- list()
 
     if (length(novel_bed)) {
-      matches[[1]] <- bedr.join.region(data$bed, novel_bed, verbose = FALSE) %>% mutate(peak = "novel", type = "gwas")
+      matches[[1]] <- bedr.join.region(data$bed, novel_bed, verbose = FALSE) %>% mutate(peak = "novel")
     }
 
     if (length(known_bed)) {
-      matches[[2]] <- bedr.join.region(data$bed, known_bed, verbose = FALSE) %>% mutate(peak = "known", type = "gwas")
+      matches[[2]] <- bedr.join.region(data$bed, known_bed, verbose = FALSE) %>% mutate(peak = "known")
     }
 
     if (length(absent_bed)) {
-      matches[[3]] <- bedr.join.region(data$bed, absent_bed, verbose = FALSE) %>% mutate(peak = "absent", type = "gwas")
+      matches[[3]] <- bedr.join.region(data$bed, absent_bed, verbose = FALSE) %>% mutate(peak = "absent")
     }
 
     # left join the labeled peak regions to the results df
     all_bed <- bind_rows(matches)
+    
   } else {
     clues_bed <- vector()
     novel_bed <- vector()
     known_bed <- vector()
     absent_bed <- mathieson_bed
 
-    all_bed <- bedr.join.region(data$bed, absent_bed, verbose = FALSE) %>% mutate(peak = "absent", type = "gwas")
+    all_bed <- bedr.join.region(data$bed, absent_bed, verbose = FALSE) %>% mutate(peak = "absent")
   }
-
-  all_bed$type <- factor(all_bed$type, levels = c("gwas", "control"), labels = c("GWAS", "Control"))
 
   data <- all_bed %>%
     filter(V4 != ".") %>%
     mutate(region = paste0(V4, ":", V5, "-", V6)) %>%
-    select(index, region, peak, type) %>%
-    left_join(data, ., by = c("bed" = "index", "type" = "type"))
+    select(index, region, peak) %>%
+    left_join(data, ., by = c("bed" = "index"))
 
   # return the df and the regions
   list("data" = data, "all" = clues_bed, "novel" = novel_bed, "known" = known_bed, "absent" = absent_bed)
+}
+
+annotate_known_snps <- function(data, known_tsv, p.signif) {
+  
+  # load the known SNPs
+  known <- fread(known_tsv, header = T, sep = "\t")
+  
+  # add a position column
+  data$pos <- data$start
+  
+  # the known SNPs may not be the same as ours, so calculate the genomic intervals of all significant peaks
+  known.sig <- known %>%
+    group_by(CHR) %>%
+    arrange(as.character(CHR), POS) %>%
+    mutate(bed = paste0("chr", CHR, ":", lag(POS) - 1, "-", right = lead(POS))) %>%
+    filter(corrected.p < p.signif) %>%
+    pull(bed)
+  
+  # merge the significant SNPs into overlapping regions (381 --> 242)
+  known.bed <- bedr.merge.region(known.sig, verbose = FALSE)
+  
+  # add a bed format column to our df
+  data <- data %>%
+    mutate(bed = paste0("chr", chrom, ":", pos - 1, "-", right = pos)) %>%
+    arrange(as.character(chrom), pos)
+  
+  # flag the SNPs in known regions
+  data$is_highlight <- in.region(data$bed, known.bed)
+  
+  # also flag exact matches
+  data$is_known <- data$rsid %in% known[known$corrected.p < p.signif,]$ID
+  
+  # also flag all rsIDs that are present
+  data$is_present <- data$rsid %in% known$ID
+  
+  data
 }
 
 
@@ -169,7 +232,7 @@ label_top_snps <- function(data, facets, num_label, p.threshold) {
   data
 }
 
-manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label = 1, show_lables = TRUE, top_snps = c(), label_colors = list(), highlight_peaks = TRUE, show_count = FALSE, show_legend = FALSE, show_strip = TRUE, wrap = FALSE, composite = FALSE, colors = NA, gene_names = NA, region_name = NA, max_height = NA, plot_title = NA, size_snps = TRUE) {
+manhattan_plot <- function(data, facets, p.genomewide, num_label = 1, show_lables = TRUE, top_snps = c(), label_colors = list(), highlight_peaks = TRUE, show_count = FALSE, show_legend = FALSE, show_strip = TRUE, wrap = FALSE, composite = FALSE, colors = NA, gene_names = NA, region_name = NA, max_height = NA, plot_title = NA, size_snps = TRUE) {
 
   # turn off the new summarise warnings
   options(dplyr.summarise.inform = FALSE)
@@ -181,7 +244,7 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
         mutate(show_label = (rsid %in% top_snps))
     } else {
       # label the top SNPs in each chromosome (after filtering)
-      data <- label_top_snps(data, facets, num_label, p.bonferroni)
+      data <- label_top_snps(data, facets, num_label, p.genomewide)
     }
   } else {
     data$show_label <- FALSE
@@ -196,7 +259,7 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
     mutate(snp_label = ifelse(show_label, rsid, NA), label_color = replace_na(label_colors[rsid], "black")) %>%
 
     # size the dots by their `s` coefficient
-    mutate(snp_size = ifelse(size_snps && p.value < p.bonferroni & !is.na(merged_peaks), abs(s) * 100, 1)) %>%
+    mutate(snp_size = ifelse(size_snps && p.value < p.genomewide & !is.na(merged_peaks), abs(s) * 100, 1)) %>%
 
     # divide positions by 10, to avoid integer overflow issue with cumulative x-axis position
     mutate(x.pos = start / 10)
@@ -240,8 +303,8 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
   plt <- ggplot(data, aes(x = BPcum, y = -log10(p.value)))
 
   # subset the points to show peaks and outliers differently
-  neutral_snps <- filter(data, p.value >= p.bonferroni & is.na(merged_peaks))
-  outlier_snps <- filter(data, p.value < p.bonferroni & is.na(merged_peaks))
+  neutral_snps <- filter(data, p.value >= p.genomewide & is.na(merged_peaks))
+  outlier_snps <- filter(data, p.value < p.genomewide & is.na(merged_peaks))
   significant_snps <- filter(data, !is.na(merged_peaks))
 
   if (composite) {
@@ -253,9 +316,11 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
       summarise(xmin = min(BPcum) - 1e6, xmax = max(BPcum) + 1e6, ymax = max(-log10(p.value) + 1)) %>%
       arrange(xmin) %>%
       mutate(xpos = (xmin + xmax) / 2, ypos = ymax + 0.5, label = paste0("Peak ", row_number())) %>%
-      # manually dodge peak 13/14 labels
-      mutate(xpos = ifelse(row_number() == 13, xpos - 1e6, xpos)) %>%
-      mutate(xpos = ifelse(row_number() == 14, xpos + 2e6, xpos), ypos = ifelse(row_number() == 14, ypos - 1, ypos)) %>%
+      # manually dodge some peak labels
+      mutate(xpos = ifelse(row_number() == 17, xpos - 2.5e6, xpos)) %>%
+      mutate(xpos = ifelse(row_number() == 18, xpos - 1.5e6, xpos), ypos = ifelse(row_number() == 18, ypos + 1, ypos)) %>%
+      mutate(xpos = ifelse(row_number() == 19, xpos + 2e6, xpos)) %>%
+      mutate(xpos = ifelse(row_number() == 21, xpos - 1e6, xpos)) %>%
       # add the gene names
       left_join(., gene_names, by = "merged_peaks") %>%
       # only display boxes for GWAS SNPs
@@ -266,7 +331,7 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
       geom_point(data = outlier_snps, color = "grey", alpha = 0.4) +
       geom_rect(data = peaks, inherit.aes = FALSE, aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = ymax, group = merged_peaks), alpha = 0.2, fill = "grey") + # , color="grey") +
       geom_point(data = significant_snps, aes(color = ancestry)) +
-      geom_shadowtext(data = peaks, aes(x = xpos, y = ypos, label = genes), hjust = "left", angle = 45, color = "black", bg.colour = "white") + # , fontface = "italic") +
+      geom_shadowtext(data = peaks, aes(x = xpos, y = ypos, label = genes), hjust = "left", angle = 45, color = "black", bg.colour = "white", cex=3.5) +
       scale_color_manual(values = colors, name = "Ancestry") # , drop = FALSE
   } else {
     if (highlight_peaks) {
@@ -296,12 +361,13 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
   plt <- plt +
 
     # custom axes
-    scale_x_continuous(label = axisdf$chrom, breaks = axisdf$center, expand = c(0, 0)) +
-    scale_y_continuous(expand = expansion(add = c(0, ifelse(composite, 5, 1)))) + # add a little padding at the top
-
+    scale_x_continuous(label = axisdf$chrom, breaks = axisdf$center, expand = c(0, ifelse(composite, 3e6, 0))) +
+    scale_y_continuous(expand = expansion(add = c(0, 10))) + # add a little padding at the top
+     
+    coord_cartesian(clip = 'off') +
+      
     xlab("") +
     geom_hline(yintercept = -log10(p.genomewide), linetype = "dashed", color = "red") +
-    geom_hline(yintercept = -log10(p.bonferroni), linetype = "dashed", color = "grey") +
 
     # set min height of the y-axis
     # expand_limits(y=-log10(p.genomewide)+0.5) +
@@ -354,6 +420,7 @@ manhattan_plot <- function(data, facets, p.genomewide, p.bonferroni, num_label =
     plt <- plt +
       # include dummy max height
       geom_blank(aes(y = max.height)) +
+      geom_blank(aes(y = 0)) +
 
       # display as a wrap
       facet_wrap(formula(paste(facets[1], "~", facets[2])), scales = "free", ncol = wrap, labeller = labeller(.multi_line = FALSE))

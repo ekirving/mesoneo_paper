@@ -19,7 +19,6 @@ source("scripts/clues_utils.R")
 
 # load the clues report
 report <- read_tsv("clues/ancestral_paths_v3-all-clues_report.tsv", col_types = cols()) %>%
-  rename(rsid = rsid_x) %>%
   select(c("rsid", "mode", "ancestry")) %>%
   drop_na()
 

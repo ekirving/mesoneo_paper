@@ -5,6 +5,7 @@ channels:
 dependencies:
   - admixtools=7.0.2
   - bcftools=1.11
+  - bedops=2.4.4
   - bedtools=2.29.2
   - biopython=1.78
   - ca-certificates=2022.12.7

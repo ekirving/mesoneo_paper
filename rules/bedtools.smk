@@ -12,7 +12,7 @@ from snakemake.io import ancient
 NON_NEUTRAL_BUFFER = 50000
 
 
-rule bedtools_genes:
+rule bedtools_gene_regions:
     input:
         "ensembl/{reference}-annotation.gtf",
     output:
@@ -21,6 +21,17 @@ rule bedtools_genes:
         'awk \'$3 == "gene" {{ print $1"\\t"$4-1"\\t"$5 }}\' {input} | '
         "bedtools sort | "
         "bedtools merge > {output}"
+
+
+rule bedtools_genes:
+    input:
+        "ensembl/{reference}-annotation.gtf",
+    output:
+        "bed/{reference}-gene_names.bed",
+    shell:
+        'awk \'$3 == "gene" {{ print $1"\\t"$4-1"\\t"$5"\\t"$14 }}\' {input} | '
+        "sed 's/[\";]//g' | "
+        "bedtools sort > {output}"
 
 
 rule bedtools_variants:
