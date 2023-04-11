@@ -22,7 +22,7 @@ argv <- parse_args(p)
 data <- fread(argv$data, header = T, sep = "\t")
 
 # calculate p-values from the log-likelihood ratio
-data$p.value <- formatC(pchisq(data$logLR, df = 1, lower.tail = FALSE), format = "e", digits = 4)
+data$p.value <- formatC(pchisq(2 * data$logLR, df = 1, lower.tail = FALSE), format = "e", digits = 4)
 
 # make sure the table is in order
 data <- data[order(chrom, start)]

@@ -35,7 +35,7 @@ load_clues <- function(clues_tsv, pairs_tsv, unmapped_tsv, flipped_tsv) {
   flipped <- read_tsv(flipped_tsv, col_types = cols(pos = "c"))
 
   # calculate p-values from the log-likelihood ratio
-  clues$p.value <- pchisq(clues$logLR, df = 1, lower.tail = FALSE)
+  clues$p.value <- pchisq(2 * clues$logLR, df = 1, lower.tail = FALSE)
 
   # determine if SNPs are GWAS or controls
   clues$type <- ifelse(clues$rsid %in% pairs$gwas, "gwas", "control")

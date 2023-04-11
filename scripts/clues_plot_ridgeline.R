@@ -27,7 +27,7 @@ report <- args[1]
 data <- fread(report, header = T, sep = "\t")
 
 # get a p-value for the test
-data$p.value <- pchisq(data$logLR, df = 1, lower.tail = FALSE)
+data$p.value <- pchisq(2 * data$logLR, df = 1, lower.tail = FALSE)
 
 # set a p-value cutoff
 p_val <- 5e-8

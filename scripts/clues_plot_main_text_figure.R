@@ -45,7 +45,7 @@ extra_snp <- read_tsv("rs1438307-report.tsv", col_types = cols()) %>%
     select(-c(derived, minor, rsid_y))
 
 # calculate p-values from the log-likelihood ratio
-extra_snp$p.value <- pchisq(extra_snp$logLR, df = 1, lower.tail = FALSE)
+extra_snp$p.value <- pchisq(2 * extra_snp$logLR, df = 1, lower.tail = FALSE)
 
 # determine if SNPs are GWAS or controls
 extra_snp$type <- "gwas"
