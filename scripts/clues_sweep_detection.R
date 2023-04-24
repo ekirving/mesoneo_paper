@@ -18,8 +18,6 @@ quiet(library(readr))
 p <- arg_parser("Detect selective sweeps in the CLUES data")
 p <- add_argument(p, "--data", help = "CLUES data", default = "clues/ancestral_paths_v3-all-ancient-ALL-filtered-clues_report.tsv")
 p <- add_argument(p, "--pairs", help = "GWAS and neutral SNP pairings", default = "variants/ancestral_paths_v3-all-pairs.tsv")
-p <- add_argument(p, "--unmapped", help = "Unmappable SNPs from Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_unmapped.tsv.gz")
-p <- add_argument(p, "--flipped", help = "Flipped SNPs from Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_flipped.tsv.gz")
 p <- add_argument(p, "--1240k", help = "Data is from the 1240k SNP array", flag = TRUE)
 p <- add_argument(p, "--output", help = "List of peaks", default = "clues/ancestral_paths_v3-all-ancient-ALL-filtered-sweeps.tsv")
 
@@ -33,16 +31,11 @@ if (!argv$`1240k`) {
     MIN_SNPS <- 6
     
     pairs <- read_tsv(argv$pairs, col_types = cols())
-    unmapped <- read_tsv(argv$unmapped, col_types = cols(.default = "c"))
-    flipped <- read_tsv(argv$flipped, col_types = cols(.default = "c"))
     
     data <- data %>%
         # determine if SNPs are GWAS or controls
-        mutate(type = ifelse(rsid %in% pairs$gwas, "gwas", "control")) %>%
-    
-        # drop any modern SNPs that were flipped or unmapped
-        mutate(pos = paste0(chrom, ":", start)) %>%
-        filter(!(mode == "modern" & (pos %in% unmapped$pos | pos %in% flipped$pos)))
+        mutate(type = ifelse(rsid %in% pairs$gwas, "gwas", "control"))
+
 } else {
     # use a smaller threshold for the 1240k data
     MIN_SNPS <- 3

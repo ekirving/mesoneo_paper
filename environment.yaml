@@ -38,6 +38,7 @@ dependencies:
   - r-desolve=1.28
   - r-directlabels=2021.1.13
   - r-dplyr=1.0.2
+  - r-english=1.2_5
   - r-expm=0.999_5
   - r-fitr=0.1
   - r-ggplot2=3.3.2

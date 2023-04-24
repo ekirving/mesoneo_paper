@@ -60,6 +60,7 @@ rs*-report.tsv
 rsconnect/
 segdups/
 selection/
+supplement*
 tsinfer/
 ukbb/
 unfiltered/

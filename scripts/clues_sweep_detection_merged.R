@@ -30,11 +30,11 @@ source("scripts/clues_utils.R")
 
 # load all the CLUES peaks (across all ancestries)
 ancient_peaks <- bind_rows(
-    read_tsv(argv$peaks_all, col_types = cols()),
-    read_tsv(argv$peaks_whg, col_types = cols()),
-    read_tsv(argv$peaks_ehg, col_types = cols()),
-    read_tsv(argv$peaks_chg, col_types = cols()),
-    read_tsv(argv$peaks_ana, col_types = cols()),
+    read_tsv(argv$peaks_all, col_types = cols(.default="n", type="c", ancestry="c", label="c", top_snp="c")),
+    read_tsv(argv$peaks_whg, col_types = cols(.default="n", type="c", ancestry="c", label="c", top_snp="c")),
+    read_tsv(argv$peaks_ehg, col_types = cols(.default="n", type="c", ancestry="c", label="c", top_snp="c")),
+    read_tsv(argv$peaks_chg, col_types = cols(.default="n", type="c", ancestry="c", label="c", top_snp="c")),
+    read_tsv(argv$peaks_ana, col_types = cols(.default="n", type="c", ancestry="c", label="c", top_snp="c")),
 )
 
 if (nrow(ancient_peaks) > 0) {

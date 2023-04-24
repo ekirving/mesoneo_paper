@@ -20,6 +20,8 @@ p <- add_argument(p, "--gwas", help = "Fj scores for the GWAS SNPs", default = "
 p <- add_argument(p, "--neut", help = "Fj scores for the neutral SNPs", default = "refbias/Evan_NEUTRAL_Anc_1000g.txt.gz")
 p <- add_argument(p, "--post", help = "Posterior frequency differences", default = "refbias/posterior-diff.tsv.gz")
 p <- add_argument(p, "--pairs", help = "GWAS and neutral SNP pairings", default = "variants/ancestral_paths_v3-all-pairs.tsv")
+p <- add_argument(p, "--unmapped", help = "List of modern SNPs unmappable by Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_unmapped.tsv.gz")
+p <- add_argument(p, "--flipped", help = "List of modern SNPs flipped by Relate", default = "relate/1000G_phase3-FIN_GBR_TSI-popsize-allsnps_flipped.tsv.gz")
 p <- add_argument(p, "--output", help = "Output file", default = "clues/ancestral_paths_v3-all-ancient-ALL-filtered-clues_report.tsv")
 
 argv <- parse_args(p)
@@ -37,6 +39,8 @@ gwas <- read_tsv(argv$gwas, col_types = cols())
 neut <- read_tsv(argv$neut, col_types = cols())
 post <- read_tsv(argv$post, col_types = cols())
 pairs <- read_tsv(argv$pairs, col_types = cols())
+unmapped <- read_tsv(argv$unmapped, col_types = cols(.default = "c"))
+flipped <- read_tsv(argv$flipped, col_types = cols(.default = "c"))
 
 cols <- colnames(data)
 
@@ -57,6 +61,12 @@ data <- data %>%
   left_join(post, by = "rsid") %>%
   filter(is.na(diff_abs) | diff_abs < POSTERIOR_MAX | logLR_no_mod > logLR_with_mod) %>%
   select(all_of(cols))
+
+# drop any modern SNPs that were flipped or unmapped
+data <- data %>%
+    mutate(pos = paste0(chrom, ":", start)) %>%
+    filter(!(mode == "modern" & (pos %in% unmapped$pos | pos %in% flipped$pos))) %>%
+    select(-pos)
 
 # filter the data to only retain SNPs for which we have a completed GWAS/Control pair
 data <- bind_rows(

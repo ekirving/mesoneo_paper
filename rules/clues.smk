@@ -256,24 +256,32 @@ rule clues_report_mode_ancestry:
         " --output {output.tsv} &> {log}"
 
 
-rule clues_report_mode_ancestry_filter_refbias:
+rule clues_report_mode_ancestry_filter_results:
     input:
         tsv="clues/{dataset}-{population}-{mode}-{ancestry}-clues_report.tsv",
         gwas="refbias/Evan_GWAS_Anc_1000g.txt.gz",
         neut="refbias/Evan_NEUTRAL_Anc_1000g.txt.gz",
         post="refbias/posterior-diff.tsv.gz",
         pairs="variants/{dataset}-{population}-pairs.tsv",
+        unmapped= lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_unmapped.tsv.gz".format(
+            panel="1000G_phase3",pops="_".join(get_modern_pops(config,wildcards))
+        ),
+        flipped= lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_flipped.tsv.gz".format(
+            panel="1000G_phase3",pops="_".join(get_modern_pops(config,wildcards))
+        ),
     output:
         tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-clues_report.tsv",
     wildcard_constraints:
         mode="ancient|modern"
     shell:
-        "Rscript scripts/filter_refbias.R"
+        "Rscript scripts/filter_results.R"
         " --data {input.tsv}"
         " --gwas {input.gwas}"
         " --neut {input.neut}"
         " --post {input.post}"
         " --pairs {input.pairs}"
+        " --unmapped {input.unmapped}"
+        " --flipped {input.flipped}"
         " --output {output.tsv}"
 
 
@@ -301,20 +309,12 @@ rule clues_sweep_detection:
     input:
         tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-clues_report.tsv",
         pairs="variants/{dataset}-{population}-pairs.tsv",
-        unmapped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_unmapped.tsv.gz".format(
-            panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
-        ),
-        flipped=lambda wildcards: "relate/{panel}-{pops}-popsize-allsnps_flipped.tsv.gz".format(
-            panel="1000G_phase3", pops="_".join(get_modern_pops(config, wildcards))
-        ),
     output:
         tsv="clues/{dataset}-{population}-{mode}-{ancestry}-filtered-sweeps.tsv",
     shell:
         "Rscript scripts/clues_sweep_detection.R"
         " --data {input.tsv}"
         " --pairs {input.pairs}"
-        " --unmapped {input.unmapped}"
-        " --flipped {input.flipped}"
         " --output {output.tsv}"
 
 
@@ -337,7 +337,7 @@ rule clues_sweep_detection_merged:
         " --output {output.tsv}"
 
 
-rule clues_report_filter_refbias:
+rule clues_report_aggregate:
     input:
         "clues/{dataset}-{population}-modern-ALL-filtered-clues_report.tsv",
         expand(

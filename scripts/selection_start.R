@@ -54,7 +54,7 @@ clues_trajectory <- function(model_path) {
 }
 
 # load the LCT sweep report
-sweep <- read_tsv("lct-sweep/lct-sweep-snps-report.tsv", guess_max = 1500, col_types = cols()) %>%
+sweep <- read_tsv("lct-sweep/lct-sweep-snps-report.tsv", guess_max = 10000, col_types = cols()) %>%
     filter(p.value <= 5e-8)
 
 # find the earliest epoch in which the frequency is above 10% with >0.5 density

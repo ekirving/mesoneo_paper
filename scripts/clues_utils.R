@@ -73,6 +73,10 @@ load_clues <- function(clues_tsv, pairs_tsv, unmapped_tsv, flipped_tsv) {
 
 sweep_to_bed <- function(peaks, distance = 1e6) {
     
+    if (nrow(peaks) == 0) {
+        return(character())
+    }
+    
     # convert harvester output to BED intervals
     bed_peaks <- peaks %>%
         mutate(bed = paste0("chr", chrom, ":", start, "-", end)) %>%
