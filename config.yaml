@@ -49,7 +49,7 @@ samples:
   imputed_unfiltered:
     reference: GRCh37
     metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
-    genotypes: unfiltered/ancestral_paths_new-all-chrALL-unfiltered-1000G.bcf
+    genotypes: data/imputed_unfiltered/ancestral_paths_new-all-chrALL-unfiltered-1000G.bcf
     is_haploid: False
     is_likelihood: False
     populations:

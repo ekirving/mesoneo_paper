@@ -19,8 +19,8 @@ rule bcftools_1000G:
             + "ALL.chr{chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz"
         ),
     output:
-        vcf=temp("unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf"),
-        csi=temp("unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf.csi"),
+        vcf=temp("data/imputed_unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf"),
+        csi=temp("data/imputed_unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf.csi"),
     params:
         samples=lambda wildcards: ",".join(get_modern_samples(config, wildcards)),
     threads: 4
@@ -39,8 +39,8 @@ rule bcftools_unfiltered:
     input:
         vcf=config["imputed"]["vcf_path"] + "chr{chr}.haplotypes.unfiltered.N1664.D15062020.GLIMPSE.vcf.gz",
     output:
-        vcf=temp("unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf"),
-        csi=temp("unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf.csi"),
+        vcf=temp("data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf"),
+        csi=temp("data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf.csi"),
     params:
         samples=lambda wildcards: ",".join(get_ancient_samples(config, wildcards)),
     threads: 4
@@ -56,14 +56,14 @@ rule bcftools_unfiltered:
 
 rule bcftools_merge:
     input:
-        vcf1="unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf",
-        csi1="unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf.csi",
-        vcf2="unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf",
-        csi2="unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf.csi",
+        vcf1="data/imputed_unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf",
+        csi1="data/imputed_unfiltered/{dataset}-{population}-chr{chr}-1000G.bcf.csi",
+        vcf2="data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf",
+        csi2="data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered.bcf.csi",
         vcf3=config["imputed"]["vcf_path"] + "chr{chr}.haplotypes.unfiltered.N1664.D15062020.GLIMPSE.vcf.gz",
     output:
-        vcf=temp("unfiltered/{dataset}-{population}-chr{chr}-unfiltered-1000G.bcf"),
-        csi=temp("unfiltered/{dataset}-{population}-chr{chr}-unfiltered-1000G.bcf.csi"),
+        vcf=temp("data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered-1000G.bcf"),
+        csi=temp("data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered-1000G.bcf.csi"),
     threads: 8
     shell:
         "bcftools merge"
@@ -79,11 +79,11 @@ rule bcftools_merge:
 rule bcftools_concat:
     input:
         expand(
-            "unfiltered/{dataset}-{population}-chr{chr}-unfiltered-1000G.bcf", chr=config["chroms"], allow_missing=True
+            "data/imputed_unfiltered/{dataset}-{population}-chr{chr}-unfiltered-1000G.bcf", chr=config["chroms"], allow_missing=True
         ),
     output:
-        vcf="unfiltered/{dataset}-{population}-chrALL-unfiltered-1000G.bcf",
-        csi="unfiltered/{dataset}-{population}-chrALL-unfiltered-1000G.bcf.csi",
+        vcf="data/imputed_unfiltered/{dataset}-{population}-chrALL-unfiltered-1000G.bcf",
+        csi="data/imputed_unfiltered/{dataset}-{population}-chrALL-unfiltered-1000G.bcf.csi",
     threads: 88
     shell:
         "bcftools concat"
