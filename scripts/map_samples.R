@@ -24,7 +24,7 @@ quiet(library(ggpubr))
 # get the command line arguments
 p <- arg_parser("Plot the map of sampling locations")
 p <- add_argument(p, "--samples", help = "Sample metadata", default = "data/ancestral_paths_v3/ancestral_paths_v3.sampleInfo.tsv")
-p <- add_argument(p, "--output", help = "PNG file to output", default = "map_samples.png")
+p <- add_argument(p, "--output", help = "PDF file to output", default = "figs_hires/Figure_1.pdf")
 
 argv <- parse_args(p)
 
@@ -60,6 +60,8 @@ plt_map <- ggplot() +
     geom_sf(data = samples_sf, mapping = aes(color=ageAverage), position="dodge") +
     # crop the map to only show West Eurasia
     coord_sf(xlim = c(-25, 77), ylim = c(33, 71.5), expand = FALSE) +
+    # mask the edges of the map
+    annotate("rect", xmin = -25, xmax = -0, ymin = 68, ymax = 100, fill = "white") +
     scale_color_viridis_c(limits = c(0, 15000), option="magma") +
     labs(colour="Sample Age") +
     theme_map() +
@@ -103,8 +105,11 @@ plt_ages <- samples %>%
     theme(
         axis.title.y=element_blank(),
         axis.text.y = element_text(vjust=-3, hjust=0, size=9, margin = margin(0, -105, 0, 0)),
+        axis.ticks.y = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = margin(0.1, 0.1, 0.1, 0.1, "cm"),
         legend.position = "none"
     ) +
     scale_y_reverse(breaks = xbreaks, labels = xlabels) +
@@ -116,6 +121,8 @@ plt_ages <- samples %>%
 # arrange the columns into a column
 main_fig <- ggarrange(
     plotlist = list(plt_map, plt_ages),
+    labels = c("a", "b"),
+    label.x = c(0.03, -0.03),
     ncol = 2,
     nrow = 1,
     widths=c(4,3)

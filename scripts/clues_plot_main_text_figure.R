@@ -27,7 +27,7 @@ p <- add_argument(p, "--peaks-chg", help = "CLUES selection peaks from the CHG a
 p <- add_argument(p, "--peaks-ana", help = "CLUES selection peaks from the ANA ancestry analysis", default = "clues/ancestral_paths_v3-all-ancient-ANA-filtered-sweeps.tsv")
 p <- add_argument(p, "--merged", help = "Merged selection peaks across ancestries", default = "clues/ancestral_paths_v3-all-ancient-filtered-sweeps-merged.tsv")
 p <- add_argument(p, "--mathieson", help = "Selection peaks from Mathieson et al. 2015", default = "mathieson/mathieson-sweeps.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "figs/ancestral_paths_v3-all-filtered-main_figure.png")
+p <- add_argument(p, "--output", help = "Output file", default = "figs_hires/Figure_4.pdf")
 
 argv <- parse_args(p)
 
@@ -152,7 +152,7 @@ plt_man <- manhattan_plot(
     gene_names = gene_names,
     size_snps = FALSE
   ) +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5), plot.margin = margin(0.5, 0.1, 0.1, 0.1, "cm"))
 
 # plt_man
 
@@ -251,12 +251,15 @@ plt_grid <- ggarrange(plotlist = plt_columns, ncol = length(focal_regions))
 # finally, top the grid with the composite Manhattan plot
 main_fig <- ggarrange(
   plotlist = list(plt_man, plt_grid),
+  labels = c("a", "b"),
+  label.x = c(-0.025, -0.025),
+  label.y = c(1, 1.02),
   heights = c(1, 4),
   ncol = 1,
   nrow = 2
-)
+) + theme(plot.margin = margin(0, 0, 0, 1, "cm"))
 
 # main_fig
 
 # page dims 183(w) x 247(h) mm
-ggsave(filename = argv$output, plot = main_fig, width = 183 * (length(focal_regions) / 3), heigh = 247 * .8, units = "mm", scale = 2, limitsize = FALSE)
+ggsave(filename = argv$output, plot = main_fig, width = 18, height = 17, units = "cm", scale = 2, limitsize = FALSE)

@@ -322,7 +322,7 @@ manhattan_plot <- function(data, facets, p.genomewide, num_label = 1, show_lable
       mutate(xpos = (xmin + xmax) / 2, ypos = ymax + 0.5, label = paste0("Peak ", row_number())) %>%
       # manually dodge some peak labels
       mutate(xpos = ifelse(row_number() == 17, xpos - 2.5e6, xpos)) %>%
-      mutate(xpos = ifelse(row_number() == 18, xpos - 1.5e6, xpos), ypos = ifelse(row_number() == 18, ypos + 1, ypos)) %>%
+      mutate(xpos = ifelse(row_number() == 18, xpos - 1.5e6, xpos), ypos = ifelse(row_number() == 18, ypos + 3, ypos)) %>%
       mutate(xpos = ifelse(row_number() == 19, xpos + 2e6, xpos)) %>%
       mutate(xpos = ifelse(row_number() == 21, xpos - 1e6, xpos)) %>%
       # add the gene names
