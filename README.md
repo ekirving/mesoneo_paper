@@ -1,16 +1,13 @@
 # Ancestry-stratified allele frequency trajectories
 This repository contains code for the ancestry stratified selection analyses from 
-[The Selection Landscape and Genetic Legacy of Ancient Eurasians](https://).
+[The Selection Landscape and Genetic Legacy of Ancient Eurasians](
+https://doi.org/10.1038/s41586-023-06705-1).
 
 ![Figure 4](./figure/Figure_4.png?raw=true)
 
-If you reuse any of this code then please cite the preprint:
-> Irving-Pease, E.K.&ast;, Refoyo-Martínez, A.&ast;, Ingason, A.&ast;, Pearson, A.&ast;, Fischer, A.&ast;, Barrie, 
-> W.&ast;, Sjögren, K.-G., Halgren, A.S., Macleod, R., Demeter, F., Henriksen, R.A., Vimala, T., McColl, H., Vaughn, A., 
-> Stern, A.J., Speidel, L., Scorrano, G., Ramsøe, A., Schork, A.J., Rosengren, A., Zhao, L., Kristiansen, K., Sudmant, 
-> P.H., Lawson, D.J., Durbin, R., Korneliussen, T., Werge, T., Allentoft, M.E., Sikora, M., Nielsen, R., Racimo, F., 
-> Willerslev, E., 2022. The Selection Landscape and Genetic Legacy of Ancient Eurasians. *bioRxiv* 2022.09.22.509027. 
-> https://www.biorxiv.org/content/10.1101/2022.09.22.509027v1
+If you reuse any of this code then please cite the paper:
+> Irving-Pease, E.K.&ast;, Refoyo-Martínez, A.&ast;, Barrie, W.&ast; et al. The selection landscape and genetic legacy 
+> of ancient Eurasians. Nature 625, 312–320 (2024). https://doi.org/10.1038/s41586-023-06705-1
 
 ## Installation
 Download the code: 
